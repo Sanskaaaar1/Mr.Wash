@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Page</title>
+    <style>
+        form {
+            border: solid black 2px;
+            width: 390px;
+            margin: 0 auto;
+            padding: 1%;
+        }
+        .error {
+            color: red;
+            font-size: 0.8em;
+            display: block;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+        }
+        td {
+            padding: 5px 0;
+        }
+        select, input[type="text"], input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <center><h1>Book The Slot</h1></center>
+    <form th:action="@{/process-booking}" th:object="${bookingValidator}" method="post">
+        <table>
+            <!-- Vehicle Type -->
+            <tr>
+                <td>
+                    <label>Vehicle Type:</label>
+                    <select th:field="*{vehicleType}">
+                        <option value="">Select Vehicle Type</option>
+                        <option th:each="vehicle : ${vehicle_list}" 
+                                th:value="${vehicle}" 
+                                th:text="${vehicle}"
+                                name="vehicleType">
+                        </option>
+                    </select>
+                    <span th:if="${#fields.hasErrors('vehicleType')}" 
+                          th:errors="*{vehicleType}" class="error"></span>
+                </td>
+            </tr>
+            
+            <!-- Vehicle Company -->
+            <tr>
+                <td>
+                    <label>Vehicle Company:</label>
+                    <input type="text" th:field="*{vehicleCompany}">
+                    <span th:if="${#fields.hasErrors('vehicleCompany')}" 
+                          th:errors="*{vehicleCompany}" class="error"></span>
+                </td>
+            </tr>
+            
+            <!-- Vehicle Name -->
+            <tr>
+                <td>
+                    <label>Vehicle Name:</label>
+                    <input type="text" th:field="*{vehicleName}">
+                    <span th:if="${#fields.hasErrors('vehicleName')}" 
+                          th:errors="*{vehicleName}" class="error"></span>
+                </td>
+            </tr>
+            
+            <!-- Vehicle Number -->
+            <tr>
+                <td>
+                    <label>Vehicle Number:</label>
+                    <input type="text" th:field="*{vehicleNumber}" 
+                           placeholder="e.g. MH 12 AB 1234">
+                    <span th:if="${#fields.hasErrors('vehicleNumber')}" 
+                          th:errors="*{vehicleNumber}" class="error"></span>
+                </td>
+            </tr>
+            
+            <!-- Date -->
+            <tr>
+                <td>
+                    <label>Date:</label>
+                    <input type="date" th:field="*{date}">
+                    <span th:if="${#fields.hasErrors('date')}" 
+                          th:errors="*{date}" class="error"></span>
+                </td>
+            </tr>
+            
+            <!-- Time -->
+            <tr>
+                <td>
+                    <label>Time (10:00 AM-6:00 PM):</label>
+                    <input type="time" th:field="*{time}">
+                    <span th:if="${#fields.hasErrors('time')}" 
+                          th:errors="*{time}" class="error"></span>
+                </td>
+            </tr>
+            
+            <!-- Service Type -->
+            <tr>
+                <td>
+                    <label>Service Type:</label>
+                    <select th:field="*{services}">
+                        <option value="">Select Service Type</option>
+                        <option th:each="service : ${service_list}" 
+                                th:value="${service}" 
+                                th:text="${service}">
+                        </option>
+                    </select>
+                    <span th:if="${#fields.hasErrors('services')}" 
+                          th:errors="*{services}" class="error"></span>
+                </td>
+            </tr>
+            
+            <!-- Submit Button -->
+            <tr>
+                <td>
+                    <center><input type="submit" value="Book Now"></center>
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
