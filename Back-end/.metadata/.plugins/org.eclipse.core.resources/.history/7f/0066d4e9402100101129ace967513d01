@@ -1,0 +1,9 @@
+package com.main.Service;
+
+import java.util.List;
+
+import com.main.Entity.Booking_Entity;
+
+public interface InfoServices {
+	List<Booking_Entity> getByName(String Name);
+}

@@ -1,0 +1,24 @@
+package com.main.ServiceImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.main.Entity.Authentication_Entity;
+import com.main.Repository.AuthRepo;
+import com.main.Service.AuthenticationService;
+
+@Service
+public class AuthenticationServiceImpl implements AuthenticationService {
+	@Autowired
+	AuthRepo authRepo;
+	
+	@Override
+	public Authentication_Entity findByUsername(String username) {
+		// TODO Auto-generated method stub
+		Authentication_Entity auth=authRepo.findByUsername(username);
+		auth.setPassword(null);
+		return auth;
+	}
+
+	
+}

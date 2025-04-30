@@ -1,0 +1,5 @@
+package com.main.Service;
+
+public interface InfoServices {
+	List<Booking_Entity> getByName(String Name);
+}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Washing Center</title>
+</head>
+<body>
+    <center>
+        <h1 th:text="${heading}">...CAR_WASHING_CENTER...</h1>
+        <form action="/booking-page" method="get">
+            <input type="submit" value="Book the Slot"/>
+        </form>
+        <form action="/history-page" method="get">
+            <input type="submit" value="History"/>
+        </form>
+	</center>   
+</body>
+</html>

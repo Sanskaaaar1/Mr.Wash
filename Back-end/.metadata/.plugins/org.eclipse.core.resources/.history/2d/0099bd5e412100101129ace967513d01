@@ -1,0 +1,13 @@
+package com.main.Repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+
+public interface InfoRepo extends JpaRepository<Info_Entity, Integer>{
+
+	List<Info_Entity> findByFirstName(String Name);
+}

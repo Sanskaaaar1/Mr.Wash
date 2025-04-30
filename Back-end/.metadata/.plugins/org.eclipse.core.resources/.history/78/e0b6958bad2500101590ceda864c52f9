@@ -1,0 +1,107 @@
+package com.main.RestController;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Repository.InfoRepo;
+import com.main.Service.BookingService;
+import com.main.Service.InfoServices;
+import com.main.Validation.RegisterValidation;
+
+@RestController
+@RequestMapping("/adminAPI")
+@CrossOrigin(origins = "http://localhost:3000")
+public class MyRestController {
+	@Autowired
+	BookingService bookingService;
+	
+	@Autowired
+	InfoServices infoService;
+	
+	@Autowired
+	InfoRepo infoRepo;
+	@GetMapping("/status/{stus}")
+	public List<Booking_Entity> searchByStatus(@PathVariable String stus  ) {
+		  return bookingService.getBookingsByStatus(stus);
+	}
+	
+	@PutMapping("/update/{id}/{status}")
+	public Optional<Booking_Entity> updateById(@PathVariable Integer id, @PathVariable String status) {
+		Optional<Booking_Entity> booking=bookingService.updateByBookingid(id,status);
+		return booking;
+	}
+	
+	@GetMapping("/todaysTask")
+	public List<Booking_Entity> todaysTask(){
+		LocalDate date=LocalDate.now();//plusDays(2);
+		List<Booking_Entity> booking=bookingService.getBookingByDate(date);
+		return booking;
+	}
+	@GetMapping("/searchByID/{id}")
+	public Optional<Booking_Entity> searchByID(@PathVariable Integer id) {
+		return bookingService.getBookingById(id);
+	}
+	@GetMapping("/searchByName/{name}")
+	public List<Booking_Entity> searchByName(@PathVariable String name) {
+	    Info_Entity info = infoService.getByName(name);
+	    List<Booking_Entity> BookingList = info.getBookings();
+	    return BookingList;
+	}
+	@GetMapping("/addEmpname/{bookingid}")
+	public Booking_Entity addEmpName(@PathVariable Integer bookingid) {
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    String username = authentication.getName();   // ✅ SAFE: Always works if JWT is valid
+	    
+	    System.out.println("Logged in username: " + username);
+	    return bookingService.AddEmp(bookingid, username);
+	}
+	@GetMapping("/searchByInfoId/{id}")
+	public Optional<Info_Entity> searchByInfoId(@PathVariable Integer id){
+		
+		Optional<Info_Entity> info=infoService.searchByInfoId(id);
+		return info;
+	}
+	@PostMapping("/UpdateUser/{userId}")
+	public Info_Entity UpdateUser(@RequestBody RegisterValidation registers,@PathVariable Integer userId) {
+		Optional<Info_Entity> info=infoService.searchByInfoId(userId);
+		if(info.isEmpty()) {
+			return null;
+		}
+		Info_Entity infoo=info.get();
+	
+		infoo.setFirstName(registers.getFirstName());
+		infoo.setLastname(registers.getLastName());
+		infoo.setMiddleName(registers.getMiddleName());
+		infoo.setEmail(registers.getMail());
+		infoo.setAddress(registers.getAddress());
+		infoo.setAge(registers.getAge());
+		infoo.setPhoneNumber(Long.parseLong(registers.getPhoneNo()));
+        infoo.setGender(Info_Entity.Gender.valueOf(registers.getGender().substring(0, 1).toUpperCase() + registers.getGender().substring(1).toLowerCase()));
+		
+        infoo=infoRepo.save(infoo);
+        return infoo;
+			
+	}
+	
+	@PutMapping("updateSlot/{id}/{date}/{time}")
+	public void Update
+	
+	
+
+	
+}
