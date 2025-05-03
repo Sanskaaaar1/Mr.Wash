@@ -1196,3 +1196,20 @@
 2025-05-03 14:55:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
 2025-05-03 15:00:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
 2025-05-03 15:05:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:10:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:15:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:20:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:25:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:30:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:35:16 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  o.s.c.n.e.s.EurekaServiceRegistry - Unregistering application EMPLOYEE-SERVICE with eureka with status DOWN
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  c.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1746266717087, current=DOWN, previous=UP]
+2025-05-03 15:35:17 [DiscoveryClient-InstanceInfoReplicator-0] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_EMPLOYEE-SERVICE/DESKTOP-B76FUV9:Employee-Service:9093: registering service...
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Destroying Spring FrameworkServlet 'dispatcherServlet'
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-05-03 15:35:17 [DiscoveryClient-InstanceInfoReplicator-0] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_EMPLOYEE-SERVICE/DESKTOP-B76FUV9:Employee-Service:9093 - registration status: 204
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-05-03 15:35:17 [RMI TCP Connection(96)-127.0.0.1] INFO  c.netflix.discovery.DiscoveryClient - Shutting down DiscoveryClient ...

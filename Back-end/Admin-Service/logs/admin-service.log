@@ -1169,3 +1169,25 @@ Identify and stop the process that's listening on port 9092 or configure this ap
 2025-05-03 15:00:18 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
 2025-05-03 15:05:18 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
 2025-05-03 15:10:18 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:15:18 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:20:18 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:25:18 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:30:18 [AsyncResolver-bootstrap-executor-0] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  o.s.c.n.e.s.EurekaServiceRegistry - Unregistering application ADMIN-SERVICE with eureka with status DOWN
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  c.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1746266716810, current=DOWN, previous=UP]
+2025-05-03 15:35:16 [DiscoveryClient-InstanceInfoReplicator-0] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_ADMIN-SERVICE/DESKTOP-B76FUV9:Admin-Service:9092: registering service...
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Destroying Spring FrameworkServlet 'dispatcherServlet'
+2025-05-03 15:35:16 [DiscoveryClient-InstanceInfoReplicator-0] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_ADMIN-SERVICE/DESKTOP-B76FUV9:Admin-Service:9092 - registration status: 204
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-05-03 15:35:16 [RMI TCP Connection(96)-127.0.0.1] INFO  c.netflix.discovery.DiscoveryClient - Shutting down DiscoveryClient ...
+2025-05-03 15:51:06 [restartedMain] INFO  com.main.AdminServiceApplication - Starting AdminServiceApplication using Java 21.0.6 with PID 11868 (C:\Users\sansk\Desktop\CarWashingManagmentSystem\Back-end\Admin-Service\target\classes started by sansk in C:\Users\sansk\Desktop\CarWashingManagmentSystem\Back-end\Admin-Service)
+2025-05-03 15:51:06 [restartedMain] INFO  com.main.AdminServiceApplication - No active profile set, falling back to 1 default profile: "default"
+2025-05-03 15:51:06 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-05-03 15:51:06 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-05-03 15:51:07 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-03 15:51:07 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 144 ms. Found 3 JPA repository interfaces.
+2025-05-03 15:51:07 [restartedMain] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=f3673292-be93-3234-8751-8873a49038e5
