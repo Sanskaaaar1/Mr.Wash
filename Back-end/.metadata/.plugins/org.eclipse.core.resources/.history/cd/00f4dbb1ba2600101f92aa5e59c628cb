@@ -1,0 +1,27 @@
+package com.main.AOPLogger;
+
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+@Aspect
+@Component
+public class AopLogger {
+	
+	 private static final Logger logger = LoggerFactory.getLogger(AopLogger.class);
+	 
+	 @After("execution(* com.main.RestController.AuthController.login(..))")
+	    public void afterLogin() {
+	        logger.info("User login attempt completed");
+	    }
+	 
+	 @AfterThrowing(pointcut="execution(* com.main.RestController.AuthController.login(..))", throwing="ex")
+	    public void afterLoginException(Exception ex) {
+	        logger.error("Unauthorised User"+ex);
+	    }
+	}

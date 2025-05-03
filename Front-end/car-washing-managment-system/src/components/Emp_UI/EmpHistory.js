@@ -12,7 +12,7 @@ export default function EmpHistory() {
 
     const fetchBookings = async () => {
       try {
-        const response = await axios.get('http://localhost:9093/empAPI/history', {
+        const response = await axios.get('http://localhost:3333/emp/empAPI/history', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ export default function EmpHistory() {
 
         {/* Page Heading */}
         <div className="bg-secondary bg-opacity-25 p-4 rounded text-center mb-4">
-          <h2 className="text-light fw-bold">Employee Booking History</h2>
+          <h2 className="text-light fw-bold">Employee Services History</h2>
         </div>
 
         {/* Error Message */}

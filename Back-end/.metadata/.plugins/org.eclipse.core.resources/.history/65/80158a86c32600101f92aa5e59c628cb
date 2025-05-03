@@ -1,0 +1,170 @@
+package com.main.AOPLogger;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Validation.RegisterValidation;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+
+@Aspect
+@Component
+public class AopLogger {
+    
+    private static final Logger logger = LoggerFactory.getLogger(AopLogger.class);
+
+    // ========== Admin Controller Pointcuts ==========
+    @Pointcut("execution(* com.main.RestController.MyRestController.searchByStatus(..))")
+    public void searchByStatusPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.updateById(..))")
+    public void updateBookingStatusPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.todaysTask(..))")
+    public void todaysTaskPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.searchByID(..))")
+    public void searchByIDPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.searchByName(..))")
+    public void searchByNamePointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.addEmpname(..))")
+    public void addEmpNamePointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.searchByInfoId(..))")
+    public void searchByInfoIdPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.UpdateUser(..))")
+    public void updateUserPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.updateSlot(..))")
+    public void updateSlotPointcut() {}
+
+    // ========== Admin Controller Advices ==========
+    @Before("searchByStatusPointcut() && args(status)")
+    public void beforeSearchByStatus(String status) {
+        logger.info("Admin searching bookings by status: {}", status);
+    }
+
+    @AfterReturning(pointcut = "searchByStatusPointcut()", returning = "bookings")
+    public void afterSearchByStatus(List<Booking_Entity> bookings) {
+        logger.info("Admin found {} bookings matching status", bookings.size());
+    }
+
+    @Before("updateBookingStatusPointcut() && args(id,status)")
+    public void beforeUpdateStatus(Integer id, String status) {
+        logger.info("Admin updating booking {} to status: {}", id, status);
+    }
+
+    @AfterReturning(pointcut = "updateBookingStatusPointcut()", returning = "booking")
+    public void afterUpdateStatus(Optional<Booking_Entity> booking) {
+        if (booking.isPresent()) {
+            logger.info("Admin successfully updated booking {}", booking.get().getBookingId());
+        } else {
+            logger.warn("Admin attempted to update non-existent booking");
+        }
+    }
+
+    @AfterReturning(pointcut = "todaysTaskPointcut()", returning = "bookings")
+    public void afterTodaysTask(List<Booking_Entity> bookings) {
+        logger.info("Admin retrieved {} bookings for today", bookings.size());
+    }
+
+    @Before("searchByIDPointcut() && args(id)")
+    public void beforeSearchByID(Integer id) {
+        logger.info("Admin searching booking by ID: {}", id);
+    }
+
+    @AfterReturning(pointcut = "searchByIDPointcut()", returning = "booking")
+    public void afterSearchByID(Optional<Booking_Entity> booking) {
+        logger.info("Admin {} found booking by ID", booking.isPresent() ? "successfully" : "did not find");
+    }
+
+    @Before("searchByNamePointcut() && args(name)")
+    public void beforeSearchByName(String name) {
+        logger.info("Admin searching bookings by customer name: {}", name);
+    }
+
+    @AfterReturning(pointcut = "searchByNamePointcut()", returning = "bookings")
+    public void afterSearchByName(List<Booking_Entity> bookings) {
+        logger.info("Admin found {} bookings for customer", bookings.size());
+    }
+
+    @Before("addEmpNamePointcut() && args(bookingid)")
+    public void beforeAddEmpName(Integer bookingid) {
+        logger.info("Admin assigning employee to booking: {}", bookingid);
+    }
+
+    @AfterReturning(pointcut = "addEmpNamePointcut()", returning = "booking")
+    public void afterAddEmpName(Booking_Entity booking) {
+        logger.info("Admin assigned {} to booking {}", booking.getEmpName(), booking.getBookingid());
+    }
+
+    @Before("searchByInfoIdPointcut() && args(id)")
+    public void beforeSearchByInfoId(Integer id) {
+        logger.info("Admin searching user info by ID: {}", id);
+    }
+
+    @AfterReturning(pointcut = "searchByInfoIdPointcut()", returning = "info")
+    public void afterSearchByInfoId(Optional<Info_Entity> info) {
+        logger.info("Admin {} found user info by ID", info.isPresent() ? "successfully" : "did not find");
+    }
+
+    @Before("updateUserPointcut() && args(registers,userId)")
+    public void beforeUpdateUser(RegisterValidation registers, Integer userId) {
+        logger.info("Admin updating user ID {} with new data", userId);
+    }
+
+    @AfterReturning(pointcut = "updateUserPointcut()", returning = "updatedUser")
+    public void afterUpdateUser(Info_Entity updatedUser) {
+        if (updatedUser != null) {
+            logger.info("Admin successfully updated user {}", updatedUser.getFirstName());
+        } else {
+            logger.warn("Admin attempted to update non-existent user");
+        }
+    }
+
+    @Before("updateSlotPointcut() && args(id,date,time)")
+    public void beforeUpdateSlot(Integer id, LocalDate date, LocalTime time) {
+        logger.info("Admin updating slot for booking {} to {} at {}", id, date, time);
+    }
+
+    @AfterReturning(pointcut = "updateSlotPointcut()", returning = "response")
+    public void afterUpdateSlot(ResponseEntity<Booking_Entity> response) {
+        if (response.getStatusCode().is2xxSuccessful()) {
+            logger.info("Admin successfully updated booking slot");
+        } else {
+            logger.warn("Admin failed to update booking slot");
+        }
+    }
+
+    // ========== Performance Monitoring ==========
+    @Around("execution(* com.main.RestController.MyRestController.*(..))")
+    public Object trackAdminControllerPerformance(ProceedingJoinPoint joinPoint) throws Throwable {
+        long startTime = System.currentTimeMillis();
+        String methodName = joinPoint.getSignature().getName();
+        
+        try {
+            Object result = joinPoint.proceed();
+            long duration = System.currentTimeMillis() - startTime;
+            logger.debug("Admin operation {} executed in {} ms", methodName, duration);
+            return result;
+        } catch (Exception ex) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("Admin operation {} failed after {} ms: {}", 
+                       methodName, duration, ex.getMessage());
+            throw ex;
+        }
+    }
+}

@@ -18,7 +18,7 @@ export default function EmpProfile() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response=await axios.get('http://localhost:9093/empAPI/MyDetails', {
+        const response=await axios.get('http://localhost:3333/emp/empAPI/MyDetails', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -100,7 +100,7 @@ export default function EmpProfile() {
           </div>
 
           {/* Dashboard Button */}
-          <button className="btn btn-primary w-100" onClick={() => navigate('/user-dashboard')}>
+          <button className="btn btn-primary w-100" onClick={() => navigate('/emp-dashboard')}>
             Go to Dashboard
           </button>
 

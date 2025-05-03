@@ -8,118 +8,163 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
-@RestControllerAdvice
+
+@RestControllerAdvice // This annotation allows centralized exception handling across all controllers
 public class GlobalExceptionHandelar {
 
-//    @ExceptionHandler
-//    public void handleCorsException(Exception ex, HttpServletResponse response) throws IOException {
-//        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-//        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//        response.setHeader("Access-Control-Allow-Headers", "*");
-//        response.setHeader("Access-Control-Allow-Credentials", "true");
-//        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-//    }
-	@ExceptionHandler(NoHistoryFoundException.class)
+    // Handler for NoHistoryFoundException
+    @ExceptionHandler(NoHistoryFoundException.class)
     public ResponseEntity<String> handleNoHistoryFoundException(NoHistoryFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	
-	@ExceptionHandler(VehicleTypeException.class)
+
+    // Handler for VehicleTypeException
+    @ExceptionHandler(VehicleTypeException.class)
     public ResponseEntity<String> handleVehicleTypeException(VehicleTypeException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(VehicleCompanyException.class)
+
+    // Handler for VehicleCompanyException
+    @ExceptionHandler(VehicleCompanyException.class)
     public ResponseEntity<String> handleVehicleCompanyException(VehicleCompanyException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(VehicleNameException.class)
+
+    // Handler for VehicleNameException
+    @ExceptionHandler(VehicleNameException.class)
     public ResponseEntity<String> handleVehicleNameException(VehicleNameException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(ServicesException.class)
+
+    // Handler for ServicesException
+    @ExceptionHandler(ServicesException.class)
     public ResponseEntity<String> handleServicesException(ServicesException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(NumberInvalidException.class)
+
+    // Handler for NumberInvalidException
+    @ExceptionHandler(NumberInvalidException.class)
     public ResponseEntity<String> handleNumberInvalidException(NumberInvalidException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(TimeBeforeException.class)
+
+    // Handler for TimeBeforeException
+    @ExceptionHandler(TimeBeforeException.class)
     public ResponseEntity<String> handleTimeBeforeException(TimeBeforeException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(TimeAfterException.class)
+
+    // Handler for TimeAfterException
+    @ExceptionHandler(TimeAfterException.class)
     public ResponseEntity<String> handleTimeAfterException(TimeAfterException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(TimeRequiredException.class)
+
+    // Handler for TimeRequiredException
+    @ExceptionHandler(TimeRequiredException.class)
     public ResponseEntity<String> handleTimeRequiredException(TimeRequiredException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(DateRequiredException.class)
+
+    // Handler for DateRequiredException
+    @ExceptionHandler(DateRequiredException.class)
     public ResponseEntity<String> handleDateRequiredException(DateRequiredException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	@ExceptionHandler(DateFutureException.class)
+
+    // Handler for DateFutureException
+    @ExceptionHandler(DateFutureException.class)
     public ResponseEntity<String> handleDateFutureException(DateFutureException ex) {
-        // Respond with a custom error message and HTTP status 404 (Not Found)
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Return 400 status with error message
     }
-	 @ExceptionHandler(FirstNameExceprtion.class)
-	    public ResponseEntity<String> handleFirstNameExceprtion(FirstNameExceprtion ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(MiddleNameException.class)
-	    public ResponseEntity<String> handleMiddleNameException(MiddleNameException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(LastNameException.class)
-	    public ResponseEntity<String> handleLastNameException(LastNameException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(PhoneNoNullException.class)
-	    public ResponseEntity<String> handlePhoneNoNullException(PhoneNoNullException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(PhoneNoInValid.class)
-	    public ResponseEntity<String> handlePhoneNoInValid(PhoneNoInValid ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(CityException.class)
-	    public ResponseEntity<String> handleCityException(CityException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(AdressException.class)
-	    public ResponseEntity<String> handleAdressException(AdressException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(AgeNullException.class)
-	    public ResponseEntity<String> handleAgeNullException(AgeNullException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(AgeLimitException.class)
-	    public ResponseEntity<String> handleAgeLimitException(AgeLimitException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(GenderException.class)
-	    public ResponseEntity<String> handleGenderException(GenderException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(UserNameException.class)
-	    public ResponseEntity<String> handleUserNameException(UserNameException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(NullPassword.class)
-	    public ResponseEntity<String> handleNullPassword(NullPassword ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(NullMailException.class)
-	    public ResponseEntity<String> handleNullMailException(NullMailException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }@ExceptionHandler(MailInvalidException.class)
-	    public ResponseEntity<String> handleMailInvalidException(MailInvalidException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }
-	    
-	    @ExceptionHandler(UserNotFoundException.class)
-	    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-	        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-	    }
+
+    // Handler for FirstNameException
+    @ExceptionHandler(FirstNameExceprtion.class)
+    public ResponseEntity<String> handleFirstNameExceprtion(FirstNameExceprtion ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for MiddleNameException
+    @ExceptionHandler(MiddleNameException.class)
+    public ResponseEntity<String> handleMiddleNameException(MiddleNameException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for LastNameException
+    @ExceptionHandler(LastNameException.class)
+    public ResponseEntity<String> handleLastNameException(LastNameException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for PhoneNoNullException
+    @ExceptionHandler(PhoneNoNullException.class)
+    public ResponseEntity<String> handlePhoneNoNullException(PhoneNoNullException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for PhoneNoInvalidException
+    @ExceptionHandler(PhoneNoInValid.class)
+    public ResponseEntity<String> handlePhoneNoInValid(PhoneNoInValid ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for CityException
+    @ExceptionHandler(CityException.class)
+    public ResponseEntity<String> handleCityException(CityException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for AddressException
+    @ExceptionHandler(AdressException.class)
+    public ResponseEntity<String> handleAdressException(AdressException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for AgeNullException
+    @ExceptionHandler(AgeNullException.class)
+    public ResponseEntity<String> handleAgeNullException(AgeNullException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for AgeLimitException
+    @ExceptionHandler(AgeLimitException.class)
+    public ResponseEntity<String> handleAgeLimitException(AgeLimitException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for GenderException
+    @ExceptionHandler(GenderException.class)
+    public ResponseEntity<String> handleGenderException(GenderException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for UserNameException
+    @ExceptionHandler(UserNameException.class)
+    public ResponseEntity<String> handleUserNameException(UserNameException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for NullPasswordException
+    @ExceptionHandler(NullPassword.class)
+    public ResponseEntity<String> handleNullPassword(NullPassword ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for NullMailException
+    @ExceptionHandler(NullMailException.class)
+    public ResponseEntity<String> handleNullMailException(NullMailException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for MailInvalidException
+    @ExceptionHandler(MailInvalidException.class)
+    public ResponseEntity<String> handleMailInvalidException(MailInvalidException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
+
+    // Handler for UserNotFoundException
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND); // Return 404 status with error message
+    }
 }

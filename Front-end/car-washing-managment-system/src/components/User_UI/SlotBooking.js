@@ -56,7 +56,7 @@ export default function SlotBooking() {
 
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:9091/userAPI/slotBooking', formData, {
+      await axios.post('http://localhost:3333/user/userAPI/slotBooking', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -88,13 +88,20 @@ export default function SlotBooking() {
             <div className="col-md-6">
               <div className="form-group">
                 <label className="form-label">Vehicle Type</label>
-                <input
-                  type="text"
+                <select
                   name="vehicleType"
                   className="form-control"
                   value={formData.vehicleType}
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select Vehicle Type</option>
+                  <option value="Truck">Truck</option>
+                  <option value="Bus">Bus</option>
+                  <option value="Auto">Auto</option>
+                  <option value="Car">Car</option>
+                  <option value="Bike">Bike</option>
+                </select>
+
                 {submitted && !formData.vehicleType && (
                   <small className="text-danger">Required</small>
                 )}
@@ -150,13 +157,18 @@ export default function SlotBooking() {
 
               <div className="form-group mt-3">
                 <label className="form-label">Service Type</label>
-                <input
-                  type="text"
-                  name="services"
-                  className="form-control"
-                  value={formData.services}
-                  onChange={handleChange}
-                />
+                <select
+  name="services"
+  className="form-control"
+  value={formData.services}
+  onChange={handleChange}
+>
+  <option value="">Select Service Type</option>
+  <option value="Basic">Basic</option>
+  <option value="Delux">Delux</option>
+  <option value="Premium">Premium</option>
+</select>
+
                 {submitted && !formData.services && (
                   <small className="text-danger">Required</small>
                 )}

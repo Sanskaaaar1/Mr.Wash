@@ -1,12 +1,10 @@
 package com.main.Service;
 
 import java.util.List;
-import java.util.Optional;
-
 import com.main.Entity.Booking_Entity;
-import com.main.Entity.Info_Entity;
 
 public interface BookingService {
-	List<Booking_Entity> getByUserHistory(String username);
-	 
+
+    // Method to fetch the booking history of a user by their username
+    List<Booking_Entity> getByUserHistory(String username);
 }

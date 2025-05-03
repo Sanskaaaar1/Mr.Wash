@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
 
 import jakarta.transaction.Transactional;
 
@@ -28,4 +29,6 @@ public interface BookingRepository extends JpaRepository<Booking_Entity, Integer
     
     @Query("SELECT b FROM Booking_Entity b WHERE LOWER(b.empName) = LOWER(:empName)")
     List<Booking_Entity> findByEmpName(String empName);
+    
+   
 }

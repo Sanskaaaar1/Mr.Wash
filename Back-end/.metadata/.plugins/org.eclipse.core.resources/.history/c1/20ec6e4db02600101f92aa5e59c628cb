@@ -1,0 +1,5 @@
+package com.main.RestController;
+
+public class AdminController {
+
+}

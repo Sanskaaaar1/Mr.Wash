@@ -11,12 +11,12 @@ import com.main.Service.AuthenticationService;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
-    AuthRepo authRepo;
+    AuthRepo authRepo; // Autowired repository to interact with the authentication database
 
     @Override
     public Optional<Authentication_Entity> findByUsername(String username) {
-        Optional<Authentication_Entity> authOptional = authRepo.findByUsername(username);
+        Optional<Authentication_Entity> authOptional = authRepo.findByUsername(username); // Fetch user by username
         authOptional.ifPresent(auth -> auth.setPassword(null)); // remove password if user found
-        return authOptional;
+        return authOptional; // Return the optional containing the user data
     }
 }

@@ -21,9 +21,10 @@ public class JwtSecurityConfig {
         http.cors()
         	.and()
         	.csrf().disable()
-            .securityMatcher("/login/**","/empAPI/**","/register/**") // REST endpoints only
+            .securityMatcher("/login/**","/empAPI/**","/register/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html") // REST endpoints only
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login/**","/register/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/empAPI/**").hasAnyRole("EMP", "ADMIN")
                 .anyRequest().authenticated()
             )

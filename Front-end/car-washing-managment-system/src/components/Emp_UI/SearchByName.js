@@ -14,14 +14,14 @@ export default function SearchBookingByName() {
       const token = localStorage.getItem('token');
       let response;
       if(role==='emp'){
-        response = await axios.get(`http://localhost:9093/empAPI/searchByName/${customerName}`, {
+        response = await axios.get(`http://localhost:3333/emp/empAPI/searchByName/${customerName}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
       }else{
-        response = await axios.get(`http://localhost:9092/adminAPI/searchByName/${customerName}`, {
+        response = await axios.get(`http://localhost:3333/admin/adminAPI/searchByName/${customerName}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',

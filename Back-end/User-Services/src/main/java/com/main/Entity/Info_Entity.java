@@ -19,162 +19,172 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
-
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Info_Entity{
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Ignoring Hibernate-specific properties during JSON serialization
+public class Info_Entity {
 
-	    @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Integer infoId;
-	    
-	    @Column(nullable = false)
-	    private String firstName;
-	    @Column(nullable = false)
-	    private String middleName;
-	    @Column( nullable = false)
-	    private String lastname;
-	    
-	    @Column(unique = true, nullable = false)
-	    private String email;
-	    @Column(nullable = false)
-	    private Integer age;
-	    @Column(nullable=false)
-	    private Long phoneNumber;
-		@Enumerated(EnumType.STRING)
-	    private Gender gender;
-	    @Column(nullable = false)
-	    private String address;
-	    @Column(nullable = false)
-	    private String city;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generate the ID
+    private Integer infoId;
+    
+    @Column(nullable = false) // Ensures first name is not null
+    private String firstName;
+    
+    @Column(nullable = false) // Ensures middle name is not null
+    private String middleName;
+    
+    @Column(nullable = false) // Ensures last name is not null
+    private String lastname;
+    
+    @Column(unique = true, nullable = false) // Ensures email is unique and not null
+    private String email;
+    
+    @Column(nullable = false) // Ensures age is not null
+    private Integer age;
+    
+    @Column(nullable = false) // Ensures phone number is not null
+    private Long phoneNumber;
+    
+    @Enumerated(EnumType.STRING) // Enum type for gender
+    private Gender gender;
+    
+    @Column(nullable = false) // Ensures address is not null
+    private String address;
+    
+    @Column(nullable = false) // Ensures city is not null
+    private String city;
 
-	    
-	    
-	    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	    private Authentication_Entity authentication;
-	    
-	    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	    @JsonIgnore
-	    private List<Booking_Entity> bookings = new ArrayList<>();
-	    
-//	    public void addBooking(Booking_Entity booking) {
-//	        bookings.add(booking);
-//	        booking.setUser(this);
-//	    }
-//
-//	    public void removeBooking(Booking_Entity booking) {
-//	        bookings.remove(booking);
-//	        booking.setUser(null);
-//	    }
-	    
-//	    public String getEmpName() {
-//	        return empName;
-//	    }
-//
-//	    public void setEmpName(String empName) {
-//	        this.empName = empName;
-//	    }
+    // One-to-one relationship with Authentication_Entity
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Authentication_Entity authentication;
+    
+    // One-to-many relationship with Booking_Entity (user can have multiple bookings)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Avoid circular reference in JSON
+    private List<Booking_Entity> bookings = new ArrayList<>();
+    
+    // Enum to represent Gender
+    public enum Gender {
+        Male, Female, Other
+    }
 
-	    // Getters and Setters
-	    public enum Gender {
-	        Male, Female, Other
-	    }
+    // Getter for phoneNumber
+    public Long getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	    public Long getPhoneNumber() {
-				return phoneNumber;
-			}
+    // Setter for phoneNumber
+    public void setPhoneNumber(Long phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-		public void setPhoneNumber(Long phoneNumber) {
-				this.phoneNumber = phoneNumber;
-			}
-		
-		public Integer getUserId() {
-			return infoId;
-		}
+    // Getter for infoId (userId)
+    public Integer getUserId() {
+        return infoId;
+    }
 
-		public void setUserId(Integer userId) {
-			this.infoId = userId;
-		}
+    // Setter for infoId (userId)
+    public void setUserId(Integer userId) {
+        this.infoId = userId;
+    }
 
-		public String getFirstName() {
-			return firstName;
-		}
+    // Getter for firstName
+    public String getFirstName() {
+        return firstName;
+    }
 
-		public void setFirstName(String firstName) {
-			this.firstName = firstName;
-		}
+    // Setter for firstName
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-		public String getMiddleName() {
-			return middleName;
-		}
+    // Getter for middleName
+    public String getMiddleName() {
+        return middleName;
+    }
 
-		public void setMiddleName(String middleName) {
-			this.middleName = middleName;
-		}
+    // Setter for middleName
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
 
-		public String getLastname() {
-			return lastname;
-		}
+    // Getter for lastname
+    public String getLastname() {
+        return lastname;
+    }
 
-		public void setLastname(String lastname) {
-			this.lastname = lastname;
-		}
+    // Setter for lastname
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
 
-		public String getEmail() {
-			return email;
-		}
+    // Getter for email
+    public String getEmail() {
+        return email;
+    }
 
-		public void setEmail(String email) {
-			this.email = email;
-		}
+    // Setter for email
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-		public Integer getAge() {
-			return age;
-		}
+    // Getter for age
+    public Integer getAge() {
+        return age;
+    }
 
-		public void setAge(Integer age) {
-			this.age = age;
-		}
+    // Setter for age
+    public void setAge(Integer age) {
+        this.age = age;
+    }
 
-		public Gender getGender() {
-			return gender;
-		}
+    // Getter for gender
+    public Gender getGender() {
+        return gender;
+    }
 
-		public void setGender(Gender gender) {
-			this.gender = gender;
-		}
+    // Setter for gender
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 
-		public String getAddress() {
-			return address;
-		}
+    // Getter for address
+    public String getAddress() {
+        return address;
+    }
 
-		public void setAddress(String address) {
-			this.address = address;
-		}
+    // Setter for address
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-		public String getCity() {
-			return city;
-		}
+    // Getter for city
+    public String getCity() {
+        return city;
+    }
 
-		public void setCity(String city) {
-			this.city = city;
-		}
+    // Setter for city
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-		public Authentication_Entity getAuthentication() {
-			return authentication;
-		}
+    // Getter for authentication
+    public Authentication_Entity getAuthentication() {
+        return authentication;
+    }
 
-		public void setAuthentication(Authentication_Entity authentication) {
-			this.authentication = authentication;
-		}
+    // Setter for authentication
+    public void setAuthentication(Authentication_Entity authentication) {
+        this.authentication = authentication;
+    }
 
-		public List<Booking_Entity> getBookings() {
-			return bookings;
-		}
+    // Getter for bookings
+    public List<Booking_Entity> getBookings() {
+        return bookings;
+    }
 
-		public void setBookings(List<Booking_Entity> bookings) {
-			this.bookings = bookings;
-		}
-	    
-
+    // Setter for bookings
+    public void setBookings(List<Booking_Entity> bookings) {
+        this.bookings = bookings;
+    }
 }

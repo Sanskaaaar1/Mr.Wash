@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 //import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @EnableJpaRepositories("com.main.repository")
 @EntityScan("com.main.Entity")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableAspectJAutoProxy
 public class UserServicesApplication {
 
 	public static void main(String[] args) {

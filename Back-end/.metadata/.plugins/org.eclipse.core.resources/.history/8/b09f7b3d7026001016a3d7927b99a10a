@@ -1,0 +1,68 @@
+package com.main.Testing;
+
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Repository.BookingRepository;
+import com.main.Repository.InfoRepository;
+import com.main.Service.BookingService;
+import com.main.Validator.BookingValidation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.http.ResponseEntity;
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+class MyRestControllerTest {
+
+    @InjectMocks
+    private MyRestController myRestController;
+
+    @Mock
+    private BookingRepository bookingRepository;
+
+    @Mock
+    private InfoRepository infoRepository;
+
+    @Mock
+    private BookingService bookingService;
+
+    @Mock
+    private Principal principal;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testSlotBooking_Success() {
+        // Given
+        BookingValidation bookingValidation = new BookingValidation();
+        bookingValidation.setVehicleType("Car");
+        bookingValidation.setVehicleCompany("Toyota");
+        bookingValidation.setVehicleName("Corolla");
+        bookingValidation.setVehicleNumber("MH 12 AB 1234");
+        bookingValidation.setDate(LocalDate.now().plusDays(1));
+        bookingValidation.setTime(LocalTime.of(11, 0));
+        bookingValidation.setServices("Oil Change");
+
+        when(principal.getName()).thenReturn("testUser");
+        Info_Entity user = new Info_Entity();
+        when(infoRepository.findByAuthenticationUsername("testUser")).thenReturn(user);
+
+        // When
+        ResponseEntity<?> response = myRestController.SlotBooking(bookingValidation, principal);
+
+        // Then
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Booking created successfully", response.getBody());
+        verify(bookingRepository, times(1)).save(any(Booking_Entity.class));
+    }
+}

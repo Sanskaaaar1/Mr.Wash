@@ -1,0 +1,92 @@
+package com.main.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Service
+public class JWTService {
+
+    private String secretkey = ""; // Secret key for signing JWT tokens
+
+    @Autowired
+    private ApplicationContext context; // Injecting ApplicationContext to access other beans
+
+    public JWTService() {
+        try {
+            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256"); // Generate key using HMACSHA256
+            SecretKey sk = keyGen.generateKey(); // Generate a secret key
+            secretkey = Base64.getEncoder().encodeToString(sk.getEncoded()); // Convert the key to Base64
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating secret key", e); // Handle error
+        }
+    }
+
+    public String generateToken(String username) { // Generate JWT token for a given username
+        UserDetails userDetails = context.getBean(MyUserDetailsService.class).loadUserByUsername(username); // Get user details
+        
+        Map<String, Object> claims = new HashMap<>(); // Create claims map
+        claims.put("roles", userDetails.getAuthorities().stream() // Add roles to claims
+                               .map(GrantedAuthority::getAuthority)
+                               .collect(Collectors.toList()));
+
+        return Jwts.builder() // Build JWT token
+                .claims(claims) // Attach custom claims (like roles)
+                .subject(username) // Set the subject (username)
+                .issuedAt(new Date(System.currentTimeMillis())) // Set the issue time
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000)) // Set expiration time (1 hour)
+                .signWith(getKey()) // Sign the token with the secret key
+                .compact(); // Return the JWT token as a string
+    }
+
+    private SecretKey getKey() { // Get the secret key for signing/validating the token
+        byte[] keyBytes = Decoders.BASE64.decode(secretkey); // Decode the key
+        return Keys.hmacShaKeyFor(keyBytes); // Return the key
+    }
+
+    public String extractUserName(String token) { // Extract the username from JWT token
+        return extractClaim(token, Claims::getSubject); // Extract the subject (username)
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) { // Extract a claim from the token
+        final Claims claims = extractAllClaims(token); // Extract all claims
+        return claimResolver.apply(claims); // Apply the claimResolver function
+    }
+
+    private Claims extractAllClaims(String token) { // Extract all claims from JWT token
+        return Jwts.parser() // Parse the JWT token
+                .setSigningKey(getKey()) // Set the signing key
+                .parseClaimsJws(token) // Parse the JWT token and get claims
+                .getBody(); // Return claims body
+    }
+
+    public boolean validateToken(String token, UserDetails userDetails) { // Validate the JWT token
+        final String userName = extractUserName(token); // Extract username from the token
+        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token)); // Check if token is valid
+    }
+
+    private boolean isTokenExpired(String token) { // Check if the JWT token is expired
+        return extractExpiration(token).before(new Date()); // Compare expiration date with current time
+    }
+
+    private Date extractExpiration(String token) { // Extract expiration date from the token
+        return extractClaim(token, Claims::getExpiration); // Extract expiration claim
+    }
+}

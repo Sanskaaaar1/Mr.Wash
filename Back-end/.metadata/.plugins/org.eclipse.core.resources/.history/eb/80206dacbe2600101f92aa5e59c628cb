@@ -1,0 +1,133 @@
+package com.main.AOPLogger;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Exception.UserNotFoundException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import java.security.Principal;
+import java.util.List;
+
+@Aspect
+@Component
+public class AopLogger {
+    
+    private static final Logger logger = LoggerFactory.getLogger(AopLogger.class);
+
+    // ========== Authentication Controller Pointcuts ==========
+    @Pointcut("execution(* com.main.RestController.AuthController.login(..))")
+    public void loginPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.AuthController.register(..))")
+    public void registerPointcut() {}
+
+    // ========== MyRestController Pointcuts ==========
+    @Pointcut("execution(* com.main.RestController.MyRestController.MyHistory(..))")
+    public void historyPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.SlotBooking(..))")
+    public void slotBookingPointcut() {}
+    
+    @Pointcut("execution(* com.main.RestController.MyRestController.MyDetails(..))")
+    public void myDetailsPointcut() {}
+
+    // ========== Authentication Advices ==========
+    @AfterReturning(pointcut = "loginPointcut()", returning = "result")
+    public void afterSuccessfulLogin(Object result) {
+        logger.info("Login successful. Result: {}", result);
+    }
+
+    @AfterThrowing(pointcut = "loginPointcut()", throwing = "ex")
+    public void afterLoginException(Exception ex) {
+        logger.error("Unauthorized login attempt. Error: {}", ex.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Stack trace: ", ex);
+        }
+    }
+    
+    @AfterReturning(pointcut="registerPointcut()", returning="result")
+    public void afterSuccessfullyRegister(Object result) {
+        logger.info("Registration successful. Result: {}", result);
+    }
+    
+    @AfterThrowing(pointcut="registerPointcut()", throwing="ex")
+    public void afterRegisterException(Exception ex) {
+        logger.error("Registration failed. Error: {}", ex.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Registration stack trace: ", ex);
+        }
+    }
+
+    // ========== MyRestController Advices ==========
+    @Before("historyPointcut() && args(principal)")
+    public void beforeHistoryAccess(JoinPoint joinPoint, Principal principal) {
+        logger.info("User '{}' accessing booking history", principal.getName());
+    }
+
+    @AfterReturning(pointcut = "historyPointcut()", returning = "bookings")
+    public void afterHistoryAccess(List<Booking_Entity> bookings) {
+        logger.info("Returned {} booking records", bookings.size());
+    }
+
+    @Before("slotBookingPointcut() && args(bookingValidation, principal)")
+    public void beforeSlotBooking(JoinPoint joinPoint, Object bookingValidation, Principal principal) {
+        logger.info("User '{}' attempting slot booking with data: {}", 
+                   principal.getName(), bookingValidation.toString());
+    }
+
+    @AfterReturning(pointcut = "slotBookingPointcut()", returning = "response")
+    public void afterSuccessfulSlotBooking(ResponseEntity<?> response) {
+        logger.info("Slot booking created successfully. Status: {}", 
+                   response.getStatusCode());
+    }
+
+    @AfterThrowing(pointcut = "slotBookingPointcut()", throwing = "ex")
+    public void afterSlotBookingException(Exception ex) {
+        logger.error("Slot booking failed. Error: {}", ex.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Slot booking stack trace: ", ex);
+        }
+    }
+
+    @Before("myDetailsPointcut() && args(principal)")
+    public void beforeMyDetailsAccess(JoinPoint joinPoint, Principal principal) {
+        logger.info("User '{}' accessing personal details", principal.getName());
+    }
+
+    @AfterReturning(pointcut = "myDetailsPointcut()", returning = "userDetails")
+    public void afterMyDetailsAccess(Info_Entity userDetails) {
+        logger.info("Returned user details for: {}", 
+                   userDetails.getFirstName() + " " + userDetails.getLastname());
+    }
+
+    @AfterThrowing(pointcut = "myDetailsPointcut()", throwing = "ex")
+    public void afterMyDetailsException(UserNotFoundException ex) {
+        logger.error("User details not found. Error: {}", ex.getMessage());
+    }
+
+    // ========== Common Performance Tracking ==========
+    @Around("historyPointcut() || slotBookingPointcut() || myDetailsPointcut()")
+    public Object trackPerformance(ProceedingJoinPoint joinPoint) throws Throwable {
+        long startTime = System.currentTimeMillis();
+        String methodName = joinPoint.getSignature().getName();
+        
+        try {
+            Object result = joinPoint.proceed();
+            long duration = System.currentTimeMillis() - startTime;
+            logger.debug("{} executed in {} ms", methodName, duration);
+            return result;
+        } catch (Exception ex) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("{} failed after {} ms with error: {}", 
+                       methodName, duration, ex.getMessage());
+            throw ex;
+        }
+    }
+}

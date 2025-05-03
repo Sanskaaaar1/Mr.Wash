@@ -1,0 +1,180 @@
+
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.main.Entity.Authentication_Entity;
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Exception.*;
+import com.main.Repository.BookingRepository;
+import com.main.Repository.InfoRepository;
+import com.main.Service.BookingService;
+import com.main.Validator.BookingValidation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
+@ExtendWith(MockitoExtension.class)
+public class MyRestControllerTest {
+
+    @Mock
+    private BookingRepository bookingRepository;
+
+    @Mock
+    private InfoRepository infoRepository;
+
+    @Mock
+    private BookingService bookingService;
+
+    @Mock
+    private Principal principal;
+
+    @InjectMocks
+    private MyRestController myRestController;
+
+    private Info_Entity testUser;
+    private Booking_Entity testBooking;
+    private BookingValidation validBookingValidation;
+
+    @BeforeEach
+    void setUp() {
+        // Setup test user
+        testUser = new Info_Entity();
+        testUser.setId(1L);
+        Authentication_Entity auth = new Authentication_Entity();
+        auth.setUsername("testuser");
+        testUser.setAuthentication(auth);
+
+        // Setup test booking
+        testBooking = new Booking_Entity();
+        testBooking.setId(1L);
+        testBooking.setUser(testUser);
+        testBooking.setVehicleType("Car");
+        testBooking.setVehicleCompany("Toyota");
+        testBooking.setVehicleName("Camry");
+        testBooking.setVehicleNumber("MH 12 AB 1234");
+        testBooking.setSlotDate(LocalDate.now().plusDays(1));
+        testBooking.setSlotTime(LocalTime.of(11, 0));
+        testBooking.setServiceType("Oil Change");
+        testBooking.setBookingDate(LocalDate.now());
+        testBooking.setBookingTime(LocalTime.now());
+        testBooking.setStatus("REQUESTED");
+
+        // Setup valid booking validation
+        validBookingValidation = new BookingValidation();
+        validBookingValidation.setVehicleType("Car");
+        validBookingValidation.setVehicleCompany("Toyota");
+        validBookingValidation.setVehicleName("Camry");
+        validBookingValidation.setVehicleNumber("MH 12 AB 1234");
+        validBookingValidation.setDate(LocalDate.now().plusDays(1));
+        validBookingValidation.setTime(LocalTime.of(11, 0));
+        validBookingValidation.setServices("Oil Change");
+    }
+
+    @Test
+    void testMyHistory_Success() {
+        // Arrange
+        List<Booking_Entity> expectedBookings = new ArrayList<>();
+        expectedBookings.add(testBooking);
+
+        when(principal.getName()).thenReturn("testuser");
+        when(bookingService.getByUserHistory("testuser")).thenReturn(expectedBookings);
+
+        // Act
+        List<Booking_Entity> result = myRestController.MyHistory(principal);
+
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals(testBooking.getVehicleType(), result.get(0).getVehicleType());
+        assertNull(result.get(0).getUser()); // Verify user is set to null
+    }
+
+    @Test
+    void testSlotBooking_Success() {
+        // Arrange
+        when(principal.getName()).thenReturn("testuser");
+        when(infoRepository.findByAuthenticationUsername("testuser")).thenReturn(testUser);
+        when(bookingRepository.save(any(Booking_Entity.class))).thenReturn(testBooking);
+
+        // Act
+        ResponseEntity<?> response = myRestController.SlotBooking(validBookingValidation, principal);
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Booking created successfully", response.getBody());
+    }
+
+    @Test
+    void testSlotBooking_InvalidVehicleType() {
+        // Arrange
+        BookingValidation invalidValidation = new BookingValidation();
+        invalidValidation.setVehicleType(null); // Invalid
+        invalidValidation.setVehicleCompany("Toyota");
+        invalidValidation.setVehicleName("Camry");
+        invalidValidation.setVehicleNumber("MH 12 AB 1234");
+        invalidValidation.setDate(LocalDate.now().plusDays(1));
+        invalidValidation.setTime(LocalTime.of(11, 0));
+        invalidValidation.setServices("Oil Change");
+
+        // Act & Assert
+        assertThrows(VehicleTypeException.class, () -> {
+            myRestController.SlotBooking(invalidValidation, principal);
+        });
+    }
+
+    @Test
+    void testSlotBooking_InvalidDate() {
+        // Arrange
+        BookingValidation invalidValidation = new BookingValidation();
+        invalidValidation.setVehicleType("Car");
+        invalidValidation.setVehicleCompany("Toyota");
+        invalidValidation.setVehicleName("Camry");
+        invalidValidation.setVehicleNumber("MH 12 AB 1234");
+        invalidValidation.setDate(LocalDate.now().minusDays(1)); // Invalid past date
+        invalidValidation.setTime(LocalTime.of(11, 0));
+        invalidValidation.setServices("Oil Change");
+
+        // Act & Assert
+        assertThrows(DateFutureException.class, () -> {
+            myRestController.SlotBooking(invalidValidation, principal);
+        });
+    }
+
+    @Test
+    void testMyDetails_Success() {
+        // Arrange
+        when(principal.getName()).thenReturn("testuser");
+        when(infoRepository.findByAuthenticationUsername("testuser")).thenReturn(testUser);
+
+        // Act
+        Info_Entity result = myRestController.MyDetails(principal);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(testUser.getId(), result.getId());
+        assertNull(result.getAuthentication()); // Verify authentication is set to null
+    }
+
+    @Test
+    void testMyDetails_UserNotFound() {
+        // Arrange
+        when(principal.getName()).thenReturn("nonexistent");
+        when(infoRepository.findByAuthenticationUsername("nonexistent")).thenReturn(null);
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class, () -> {
+            myRestController.MyDetails(principal);
+        });
+    }
+}

@@ -15,14 +15,14 @@ export default function SearchBookingByStatus() {
       let response;
 
       if(role==="emp"){
-        response = await axios.get(`http://localhost:9093/empAPI/status/${status}`, {
+        response = await axios.get(`http://localhost:3333/emp/empAPI/status/${status}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });
       }else{
-        response = await axios.get(`http://localhost:9092/adminAPI/status/${status}`, {
+        response = await axios.get(`http://localhost:3333/admin/adminAPI/status/${status}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -111,13 +111,15 @@ export default function SearchBookingByStatus() {
                     <td>{booking.vehicleCompany} {booking.vehicleName} ({booking.vehicleNumber})</td>
                     <td>{booking.user.firstName} {booking.user.middleName} {booking.user.lastname}</td>
                     <td>
-                      <span className={`badge ${
-                        booking.status === 'COMPLETED' ? 'bg-success' :
-                        booking.status === 'CANCEL' ? 'bg-danger' :
-                        'bg-warning text-dark'
-                      }`}>
+                    <span className={`badge ${
+                        booking.status === 'COMPLETED' || booking.status === 'Completed' ? 'bg-success' :
+                        booking.status === 'CANCEL' || booking.status === 'Cancel' ? 'bg-danger' :
+                        booking.status === 'REQUESTED' || booking.status === 'Requested' ? 'bg-primary' :
+                        booking.status === 'SCHEDULED' || booking.status === 'Scheduled' ? 'bg-warning text-dark' :
+                        'bg-secondary'
+                        }`}>
                         {booking.status}
-                      </span>
+                  </span>
                     </td>
                     <td>
                       <button className="btn btn-info btn-sm" onClick={() => handleUserClick(booking.user)}>

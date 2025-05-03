@@ -15,13 +15,13 @@ export default function CancelBooking() {
       const token = localStorage.getItem("token");
       let response;
       if(role==='emp'){
-        response = await axios.get(`http://localhost:9093/empAPI/searchByID/${id}`, {
+        response = await axios.get(`http://localhost:3333/emp/empAPI/searchByID/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           }
         });
-      }if(role==='admin'){response = await axios.get(`http://localhost:9092/adminAPI/searchByID/${id}`, {
+      }if(role==='admin'){response = await axios.get(`http://localhost:3333/admin/adminAPI/searchByID/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -55,14 +55,14 @@ export default function CancelBooking() {
     try {
       let response;
       if(role==='emp'){
-        response = await axios.get(`http://localhost:9093/empAPI/addEmpname/${bookingId}`, {
+        response = await axios.get(`http://localhost:3333/emp/empAPI/addEmpname/${bookingId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
       }else{
-          response = await axios.get(`http://localhost:9092/adminAPI/addEmpname/${bookingId}`, {
+          response = await axios.get(`http://localhost:3333/admin/adminAPI/addEmpname/${bookingId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -81,14 +81,14 @@ export default function CancelBooking() {
     try {
       await handleAddEmpName(bookingId);
       if(role==='emp'){
-        await axios.put(`http://localhost:9093/empAPI/update/${bookingId}/${newStatus}`, null, {
+        await axios.put(`http://localhost:3333/emp/empAPI/update/${bookingId}/${newStatus}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
       }else{
-        await axios.put(`http://localhost:9092/adminAPI/update/${bookingId}/${newStatus}`, null, {
+        await axios.put(`http://localhost:3333/admin/adminAPI/update/${bookingId}/${newStatus}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'

@@ -1,0 +1,113 @@
+package com.main.RestController;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import com.main.Entity.Info_Entity;
+import com.main.Exception.*;
+import com.main.Validator.BookingValidation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class MyRestControllerTest {
+
+    private MyRestController controller;
+    private Principal principal;
+    private BookingValidation validBooking;
+
+    @BeforeEach
+    void setUp() {
+        controller = new MyRestController();
+        principal = () -> "testuser"; // Simple Principal implementation
+        
+        // Setup valid booking data
+        validBooking = new BookingValidation();
+        validBooking.setVehicleType("Car");
+        validBooking.setVehicleCompany("Toyota");
+        validBooking.setVehicleName("Camry");
+        validBooking.setVehicleNumber("MH 12 AB 1234");
+        validBooking.setDate(LocalDate.now().plusDays(1));
+        validBooking.setTime(LocalTime.of(11, 0));
+        validBooking.setServices("Oil Change");
+    }
+
+    @Test
+    void testSlotBooking_ValidInput() {
+        // This will throw NPE because we're not mocking repositories
+        // But we can test the validation logic
+        assertDoesNotThrow(() -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+    }
+
+    @Test
+    void testSlotBooking_InvalidVehicleType() {
+        BookingValidation invalid = new BookingValidation();
+        invalid.setVehicleType(null); // Invalid
+        
+        Exception exception = assertThrows(VehicleTypeException.class, () -> {
+            controller.SlotBooking(invalid, principal);
+        });
+        
+        assertEquals("Vehicle type is required", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_InvalidVehicleNumber() {
+        BookingValidation invalid = new BookingValidation();
+        invalid.setVehicleType("Car");
+        invalid.setVehicleCompany("Toyota");
+        invalid.setVehicleName("Camry");
+        invalid.setVehicleNumber("INVALID"); // Invalid format
+        invalid.setDate(LocalDate.now().plusDays(1));
+        invalid.setTime(LocalTime.of(11, 0));
+        invalid.setServices("Oil Change");
+        
+        Exception exception = assertThrows(NumberInvalidException.class, () -> {
+            controller.SlotBooking(invalid, principal);
+        });
+        
+        assertEquals("Invalid format. Example: MH 12 AB 1234", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_TimeBefore10AM() {
+        BookingValidation invalid = new BookingValidation();
+        invalid.setVehicleType("Car");
+        invalid.setVehicleCompany("Toyota");
+        invalid.setVehicleName("Camry");
+        invalid.setVehicleNumber("MH 12 AB 1234");
+        invalid.setDate(LocalDate.now().plusDays(1));
+        invalid.setTime(LocalTime.of(9, 0)); // Before 10 AM
+        invalid.setServices("Oil Change");
+        
+        Exception exception = assertThrows(TimeBeforeException.class, () -> {
+            controller.SlotBooking(invalid, principal);
+        });
+        
+        assertEquals("Time must be after 10 AM", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_DateInPast() {
+        BookingValidation invalid = new BookingValidation();
+        invalid.setVehicleType("Car");
+        invalid.setVehicleCompany("Toyota");
+        invalid.setVehicleName("Camry");
+        invalid.setVehicleNumber("MH 12 AB 1234");
+        invalid.setDate(LocalDate.now().minusDays(1)); // Past date
+        invalid.setTime(LocalTime.of(11, 0));
+        invalid.setServices("Oil Change");
+        
+        Exception exception = assertThrows(DateFutureException.class, () -> {
+            controller.SlotBooking(invalid, principal);
+        });
+        
+        assertEquals("Date must be in the future", exception.getMessage());
+    }
+
+    // Add more validation tests for other scenarios...
+}

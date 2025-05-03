@@ -1,0 +1,91 @@
+package com.main.Entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+
+@Entity
+public class Authentication_Entity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generate ID
+    private Integer authId;
+    
+    @OneToOne // One-to-one relationship with Info_Entity
+    @JoinColumn(name = "info_id", nullable = true, unique = true) // Foreign key for Info_Entity
+    
+    @JsonIgnore // Ignore the field during JSON serialization
+    private Info_Entity user;
+    
+    @Column(unique = true, nullable = false) // Ensures the username is unique and not null
+    private String username;
+    
+    @Column(nullable = false) // Ensures the password is not null
+    private String password;
+    
+    @Enumerated(EnumType.STRING) // Enum to store roles as strings
+    @Column(nullable = false) // Ensures the role is not null
+    private Role role;
+    
+    // Enum to define different roles
+    public enum Role {
+        ADMIN, USER, EMP // Possible roles
+    }
+
+    // Getter for authId
+    public Integer getAuthId() {
+        return authId;
+    }
+
+    // Setter for authId
+    public void setAuthId(Integer authId) {
+        this.authId = authId;
+    }
+
+    // Getter for user (Info_Entity)
+    public Info_Entity getUser() {
+        return user;
+    }
+
+    // Setter for user (Info_Entity)
+    public void setUser(Info_Entity user) {
+        this.user = user;
+    }
+
+    // Getter for username
+    public String getUsername() {
+        return username;
+    }
+
+    // Setter for username
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    // Getter for password
+    public String getPassword() {
+        return password;
+    }
+
+    // Setter for password
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    // Getter for role
+    public Role getRole() {
+        return role;
+    }
+
+    // Setter for role
+    public void setRole(Role role) {
+        this.role = role;
+    }
+}

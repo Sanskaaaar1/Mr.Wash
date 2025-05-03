@@ -1,0 +1,209 @@
+package com.main.Testing;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Optional;
+
+import com.main.DTO.JwtResponse;
+import com.main.Entity.Authentication_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Exception.*;
+import com.main.Repository.AuthRepo;
+import com.main.Repository.InfoRepository;
+import com.main.Service.AuthService;
+import com.main.Service.AuthenticationService;
+import com.main.Validator.RegisterValidation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+public class MyAuthControllerTest {
+
+    private AuthController authController;
+    private TestAuthService authService;
+    private TestInfoRepository infoRepo;
+    private TestAuthRepo authRepo;
+    private BCryptPasswordEncoder passwordEncoder;
+    private TestAuthenticationService authenticationService;
+
+    private RegisterValidation validRegister;
+    private Authentication_Entity validAuth;
+    private Info_Entity validInfo;
+
+    // Test implementations of dependencies
+    class TestAuthService extends AuthService {
+        public String verifyResult = "token";
+        @Override
+        public String verify(Authentication_Entity user) {
+            return verifyResult;
+        }
+    }
+
+    class TestInfoRepository extends InfoRepository {
+        public Info_Entity savedInfo;
+        @Override
+        public Info_Entity save(Info_Entity entity) {
+            savedInfo = entity;
+            return entity;
+        }
+    }
+
+    class TestAuthRepo extends AuthRepo {
+        public Authentication_Entity savedAuth;
+        @Override
+        public Authentication_Entity save(Authentication_Entity entity) {
+            savedAuth = entity;
+            return entity;
+        }
+    }
+
+    class TestAuthenticationService extends AuthenticationService {
+        public Authentication_Entity findResult;
+        @Override
+        public Optional<Authentication_Entity> findByUsername(String username) {
+            return Optional.ofNullable(findResult);
+        }
+    }
+
+    @BeforeEach
+    void setUp() {
+        authService = new TestAuthService();
+        infoRepo = new TestInfoRepository();
+        authRepo = new TestAuthRepo();
+        passwordEncoder = new BCryptPasswordEncoder();
+        authenticationService = new TestAuthenticationService();
+
+        authController = new AuthController();
+        authController.service = authService;
+        authController.infoRepo = infoRepo;
+        authController.authRepo = authRepo;
+        authController.passwordEncoder = passwordEncoder;
+        authController.authService = authenticationService;
+
+        // Setup valid registration data
+        validRegister = new RegisterValidation();
+        validRegister.setFirstName("John");
+        validRegister.setMiddleName("Middle");
+        validRegister.setLastName("Doe");
+        validRegister.setPhoneNo("1234567890");
+        validRegister.setCity("New York");
+        validRegister.setAddress("123 Main St");
+        validRegister.setAge(25);
+        validRegister.setGender("male");
+        validRegister.setUsername("johndoe");
+        validRegister.setPassword("password123");
+        validRegister.setMail("john@gmail.com");
+
+        // Setup test auth entity
+        validAuth = new Authentication_Entity();
+        validAuth.setUsername("johndoe");
+        validAuth.setPassword("encodedPassword");
+        validAuth.setRole(Authentication_Entity.Role.USER);
+
+        // Setup test info entity
+        validInfo = new Info_Entity();
+        validInfo.setFirstName("John");
+        validInfo.setEmail("john@gmail.com");
+    }
+
+    // Register endpoint tests
+    @Test
+    void testRegister_Success() {
+        ResponseEntity<?> response = authController.register(validRegister);
+        
+        assertEquals("Account created successfully!", response.getBody());
+        assertNotNull(infoRepo.savedInfo);
+        assertNotNull(authRepo.savedAuth);
+        assertEquals("John", infoRepo.savedInfo.getFirstName());
+        assertEquals("johndoe", authRepo.savedAuth.getUsername());
+    }
+
+    @Test
+    void testRegister_FirstNameMissing() {
+        validRegister.setFirstName(null);
+        
+        Exception exception = assertThrows(FirstNameExceprtion.class, () -> {
+            authController.register(validRegister);
+        });
+        
+        assertEquals("First Name is Required", exception.getMessage());
+    }
+
+    @Test
+    void testRegister_LastNameMissing() {
+        validRegister.setLastName(null);
+        
+        Exception exception = assertThrows(LastNameException.class, () -> {
+            authController.register(validRegister);
+        });
+        
+        assertEquals("Last Name is Required", exception.getMessage());
+    }
+
+    @Test
+    void testRegister_PhoneInvalid() {
+        validRegister.setPhoneNo("123");
+        
+        Exception exception = assertThrows(PhoneNoInValid.class, () -> {
+            authController.register(validRegister);
+        });
+        
+        assertEquals("PhoneNo should be 10 digits", exception.getMessage());
+    }
+
+    @Test
+    void testRegister_AgeBelow18() {
+        validRegister.setAge(17);
+        
+        Exception exception = assertThrows(AgeLimitException.class, () -> {
+            authController.register(validRegister);
+        });
+        
+        assertEquals("Age should be more than 18", exception.getMessage());
+    }
+
+    @Test
+    void testRegister_InvalidGender() {
+        validRegister.setGender("other");
+        
+        Exception exception = assertThrows(GenderException.class, () -> {
+            authController.register(validRegister);
+        });
+        
+        assertEquals("Gender should be MALE or FEMALE", exception.getMessage());
+    }
+
+    @Test
+    void testRegister_InvalidEmail() {
+        validRegister.setMail("invalid-email");
+        
+        Exception exception = assertThrows(MailInvalidException.class, () -> {
+            authController.register(validRegister);
+        });
+        
+        assertEquals("Mail is Invalid", exception.getMessage());
+    }
+
+    // Login endpoint tests
+    @Test
+    void testLogin_Success() {
+        String result = authController.login(validAuth);
+        assertEquals("token", result);
+    }
+
+    // SearchUsername endpoint tests
+    @Test
+    void testSearchUsername_Found() {
+        authenticationService.findResult = validAuth;
+        ResponseEntity<?> response = authController.searchByUsername("johndoe");
+        assertEquals(validAuth, response.getBody());
+    }
+
+    @Test
+    void testSearchUsername_NotFound() {
+        authenticationService.findResult = null;
+        ResponseEntity<?> response = authController.searchByUsername("unknown");
+        assertNull(response.getBody());
+    }
+}

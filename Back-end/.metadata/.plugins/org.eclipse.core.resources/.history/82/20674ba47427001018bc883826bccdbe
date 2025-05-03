@@ -1,0 +1,396 @@
+package com.main.RestController;
+
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.main.Entity.Authentication_Entity;
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Exception.DateFutureException;
+import com.main.Exception.DateRequiredException;
+import com.main.Exception.NumberInvalidException;
+import com.main.Exception.ServicesException;
+import com.main.Exception.TimeAfterException;
+import com.main.Exception.TimeBeforeException;
+import com.main.Exception.TimeRequiredException;
+import com.main.Exception.UserNotFoundException;
+import com.main.Exception.VehicleCompanyException;
+import com.main.Exception.VehicleNameException;
+import com.main.Exception.VehicleTypeException;
+import com.main.Repository.BookingRepository;
+import com.main.Repository.InfoRepository;
+import com.main.Service.AuthService;
+import com.main.Service.AuthenticationService;
+import com.main.Service.BookingService;
+import com.main.Validator.BookingValidation;
+
+import jakarta.validation.Valid;
+
+@RestController // Marks this class as a REST controller
+@RequestMapping("/userAPI") // Defines the base URL for the user-related endpoints
+@CrossOrigin(origins = "http://localhost:3000") // Allows cross-origin requests from this URL
+public class MyRestController {
+	
+	@Autowired
+	BookingRepository bookingRepository; // Repository for handling booking entity database operations
+	
+	@Autowired
+	InfoRepository infoRepository; // Repository for handling info entity database operations
+	
+	@Autowired
+	BookingService bookingService; // Service for handling business logic related to bookings
+	
+	@Autowired
+	AuthenticationService authService; // Service for handling authentication operations
+
+	// Endpoint to fetch booking history for the authenticated user
+	@GetMapping("/history")
+	public List<Booking_Entity> MyHistory(Principal principal) {
+		String username = principal.getName(); // Get the username of the authenticated user
+		List<Booking_Entity> lists = bookingService.getByUserHistory(username); // Fetch the user's booking history
+		for (Booking_Entity b : lists) {
+			b.setUser(null); // Remove sensitive user data from the response
+		}
+		return lists; // Return the booking history
+	}
+
+	// Endpoint to book a slot for a vehicle service
+	@PostMapping("/slotBooking")
+	public ResponseEntity<?> SlotBooking(@RequestBody BookingValidation bookingValidation, Principal principal) {
+		Booking_Entity booking = new Booking_Entity(); // Create a new booking entity
+
+		// Validate input fields for vehicle type, company, name, services, etc.
+    	if (bookingValidation.getVehicleType() == null || bookingValidation.getVehicleType().trim().isEmpty()) {
+    	    throw new VehicleTypeException("Vehicle type is required");
+    	}
+
+    	if (bookingValidation.getVehicleCompany() == null || bookingValidation.getVehicleCompany().trim().isEmpty()) {
+    	   throw new VehicleCompanyException("Vehicle Company is required");
+    	}
+
+    	if (bookingValidation.getVehicleName() == null || bookingValidation.getVehicleName().trim().isEmpty()) {
+    	    throw new VehicleNameException("Vehicle Name is required");
+    	}
+
+    	if (bookingValidation.getServices() == null || bookingValidation.getServices().trim().isEmpty()) {
+    	    throw new ServicesException("Service type is required");
+    	}
+
+    	if (bookingValidation.getVehicleNumber() == null || 
+    	    !bookingValidation.getVehicleNumber().matches("^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,2}[ -][0-9]{4}$")) {
+    	    throw new NumberInvalidException("Invalid format. Example: MH 12 AB 1234");
+    	}
+
+    	if (bookingValidation.getTime() != null) {
+    	    if (bookingValidation.getTime().isBefore(LocalTime.of(10, 0))) {
+    	        throw new TimeBeforeException("Time must be after 10 AM");
+    	    } else if (bookingValidation.getTime().isAfter(LocalTime.of(18, 0))) {
+    	        throw new TimeAfterException("Time must be before 6 PM");
+    	    }
+    	} else {
+    	    throw new TimeRequiredException("Time is required");
+    	}
+
+    	if (bookingValidation.getDate() == null) {
+    	    throw new DateRequiredException("Date is required");
+    	} else if (bookingValidation.getDate().isBefore(LocalDate.now()) || 
+    	           bookingValidation.getDate().isEqual(LocalDate.now())) {
+    	    throw new DateFutureException("Date must be in the future");
+    	}
+
+    	// Get user information from the principal (currently authenticated user)
+    	String username = principal.getName();
+    	Info_Entity user = infoRepository.findByAuthenticationUsername(username);
+       
+    	// Set the booking details from the validated input
+    	booking.setUser(user);
+    	booking.setVehicleType(bookingValidation.getVehicleType());
+    	booking.setVehicleCompany(bookingValidation.getVehicleCompany());
+    	booking.setVehicleName(bookingValidation.getVehicleName());
+    	booking.setVehicleNumber(bookingValidation.getVehicleNumber());
+    	booking.setSlotDate(bookingValidation.getDate());
+    	booking.setSlotTime(bookingValidation.getTime());
+    	booking.setServiceType(bookingValidation.getServices());
+    	booking.setBookingDate(LocalDate.now());
+    	booking.setBookingTime(LocalTime.now());
+    	booking.setStatus("REQUESTED"); // Set initial status as requested
+    	
+    	// Save the booking to the database
+    	bookingRepository.save(booking);
+
+		return ResponseEntity.ok("Booking created successfully"); // Return success response
+	}
+
+	// Endpoint to fetch details of the authenticated user
+	@GetMapping("/MyDetails")
+	public Info_Entity MyDetails(Principal principal) {
+		String username = principal.getName(); // Get the username of the authenticated user
+    	Info_Entity user = infoRepository.findByAuthenticationUsername(username); // Fetch user details
+    	if (user == null) {
+    		throw new UserNotFoundException("User Not Found"); // If user is not found, throw an exception
+    	}
+    	user.setAuthentication(null); // Remove sensitive authentication data
+		return user; // Return user details
+	}
+}
+//package com.main.RestController;
+//
+//import org.springframework.web.bind.annotation.RequestMethod;
+//
+//import java.security.Principal;
+//import java.time.LocalDate;
+//import java.time.LocalTime;
+//import java.util.List;
+//import java.util.Optional;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.validation.BindingResult;
+//import org.springframework.validation.ObjectError;
+//import org.springframework.web.bind.annotation.CrossOrigin;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.PathVariable;
+//import org.springframework.web.bind.annotation.PostMapping;
+//import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RestController;
+//
+//import com.main.Entity.Authentication_Entity;
+//import com.main.Entity.Booking_Entity;
+//import com.main.Entity.Info_Entity;
+//import com.main.Exception.DateFutureException;
+//import com.main.Exception.DateRequiredException;
+//import com.main.Exception.NumberInvalidException;
+//import com.main.Exception.ServicesException;
+//import com.main.Exception.TimeAfterException;
+//import com.main.Exception.TimeBeforeException;
+//import com.main.Exception.TimeRequiredException;
+//import com.main.Exception.UserNotFoundException;
+//import com.main.Exception.VehicleCompanyException;
+//import com.main.Exception.VehicleNameException;
+//import com.main.Exception.VehicleTypeException;
+//import com.main.Repository.BookingRepository;
+//import com.main.Repository.InfoRepository;
+//import com.main.Service.AuthService;
+//import com.main.Service.AuthenticationService;
+//import com.main.Service.BookingService;
+//import com.main.Validator.BookingValidation;
+//
+//import io.swagger.v3.oas.annotations.Operation;
+//import io.swagger.v3.oas.annotations.Parameter;
+//import io.swagger.v3.oas.annotations.media.Content;
+//import io.swagger.v3.oas.annotations.media.Schema;
+//import io.swagger.v3.oas.annotations.responses.ApiResponse;
+//import io.swagger.v3.oas.annotations.responses.ApiResponses;
+//import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+//import io.swagger.v3.oas.annotations.tags.Tag;
+//import jakarta.validation.Valid;
+//
+//@RestController
+//@RequestMapping("/userAPI")
+//@CrossOrigin(origins = "http://localhost:3000")
+//@Tag(name = "User Services", description = "Endpoints for user operations")
+//@SecurityRequirement(name = "bearerAuth")
+//public class MyRestController {
+//    
+//    @Autowired
+//    BookingRepository bookingRepository;
+//    
+//    @Autowired
+//    InfoRepository infoRepository;
+//    
+//    @Autowired
+//    BookingService bookingService;
+//    
+//    @Autowired
+//    AuthenticationService authService;
+//
+//    @Operation(
+//        summary = "Get booking history", 
+//        description = "Retrieves the booking history for the authenticated user"
+//    )
+//    @ApiResponses(value = {
+//        @ApiResponse(
+//            responseCode = "200", 
+//            description = "Successfully retrieved history",
+//            content = @Content(
+//                mediaType = "application/json",
+//                schema = @Schema(implementation = Booking_Entity.class, type = "array")
+//            )
+//        ),
+//        @ApiResponse(
+//            responseCode = "401", 
+//            description = "Unauthorized - Authentication required"
+//        ),
+//        @ApiResponse(
+//            responseCode = "403", 
+//            description = "Forbidden - Insufficient permissions"
+//        )
+//    })
+//    @GetMapping("/history")
+//    public List<Booking_Entity> MyHistory(
+//        @Parameter(hidden = true) Principal principal) {
+//        String username = principal.getName();
+//        List<Booking_Entity> lists = bookingService.getByUserHistory(username);
+//        for (Booking_Entity b : lists) {
+//            b.setUser(null);
+//        }
+//        return lists;
+//    }
+//
+//    @Operation(
+//        summary = "Book a service slot", 
+//        description = "Creates a new booking for vehicle service with validation"
+//    )
+//    @ApiResponses(value = {
+//        @ApiResponse(
+//            responseCode = "200", 
+//            description = "Booking created successfully",
+//            content = @Content(
+//                mediaType = "text/plain",
+//                schema = @Schema(implementation = String.class)
+//            )
+//        ),
+//        @ApiResponse(
+//            responseCode = "400", 
+//            description = "Bad Request - Invalid input data",
+//            content = @Content(
+//                mediaType = "application/json",
+//                schema = @Schema(implementation = String.class)
+//            )
+//        ),
+//        @ApiResponse(
+//            responseCode = "401", 
+//            description = "Unauthorized - Authentication required"
+//        ),
+//        @ApiResponse(
+//            responseCode = "403", 
+//            description = "Forbidden - Insufficient permissions"
+//        )
+//    })
+//    @PostMapping("/slotBooking")
+//    public ResponseEntity<?> SlotBooking(
+//        @Parameter(
+//            description = "Booking details", 
+//            required = true,
+//            content = @Content(
+//                schema = @Schema(implementation = BookingValidation.class)
+//            )
+//        )
+//        @RequestBody @Valid BookingValidation bookingValidation, 
+//        @Parameter(hidden = true) Principal principal) {
+//        
+//        Booking_Entity booking = new Booking_Entity();
+//
+//        if (bookingValidation.getVehicleType() == null || bookingValidation.getVehicleType().trim().isEmpty()) {
+//            throw new VehicleTypeException("Vehicle type is required");
+//        }
+//
+//        if (bookingValidation.getVehicleCompany() == null || bookingValidation.getVehicleCompany().trim().isEmpty()) {
+//            throw new VehicleCompanyException("Vehicle Company is required");
+//        }
+//
+//        if (bookingValidation.getVehicleName() == null || bookingValidation.getVehicleName().trim().isEmpty()) {
+//            throw new VehicleNameException("Vehicle Name is required");
+//        }
+//
+//        if (bookingValidation.getServices() == null || bookingValidation.getServices().trim().isEmpty()) {
+//            throw new ServicesException("Service type is required");
+//        }
+//
+//        if (bookingValidation.getVehicleNumber() == null || 
+//            !bookingValidation.getVehicleNumber().matches("^[A-Z]{2}[ -][0-9]{1,2}[ -][A-Z]{1,2}[ -][0-9]{4}$")) {
+//            throw new NumberInvalidException("Invalid format. Example: MH 12 AB 1234");
+//        }
+//
+//        if (bookingValidation.getTime() != null) {
+//            if (bookingValidation.getTime().isBefore(LocalTime.of(10, 0))) {
+//                throw new TimeBeforeException("Time must be after 10 AM");
+//            } else if (bookingValidation.getTime().isAfter(LocalTime.of(18, 0))) {
+//                throw new TimeAfterException("Time must be before 6 PM");
+//            }
+//        } else {
+//            throw new TimeRequiredException("Time is required");
+//        }
+//
+//        if (bookingValidation.getDate() == null) {
+//            throw new DateRequiredException("Date is required");
+//        } else if (bookingValidation.getDate().isBefore(LocalDate.now()) || 
+//                   bookingValidation.getDate().isEqual(LocalDate.now())) {
+//            throw new DateFutureException("Date must be in the future");
+//        }
+//
+//        String username = principal.getName();
+//        Info_Entity user = infoRepository.findByAuthenticationUsername(username);
+//       
+//        booking.setUser(user);
+//        booking.setVehicleType(bookingValidation.getVehicleType());
+//        booking.setVehicleCompany(bookingValidation.getVehicleCompany());
+//        booking.setVehicleName(bookingValidation.getVehicleName());
+//        booking.setVehicleNumber(bookingValidation.getVehicleNumber());
+//        booking.setSlotDate(bookingValidation.getDate());
+//        booking.setSlotTime(bookingValidation.getTime());
+//        booking.setServiceType(bookingValidation.getServices());
+//        booking.setBookingDate(LocalDate.now());
+//        booking.setBookingTime(LocalTime.now());
+//        booking.setStatus("REQUESTED");
+//        
+//        bookingRepository.save(booking);
+//
+//        return ResponseEntity.ok("Booking created successfully");
+//    }
+//
+//    @Operation(
+//        summary = "Get user details", 
+//        description = "Retrieves details of the authenticated user"
+//    )
+//    @ApiResponses(value = {
+//        @ApiResponse(
+//            responseCode = "200", 
+//            description = "Successfully retrieved user details",
+//            content = @Content(
+//                mediaType = "application/json",
+//                schema = @Schema(implementation = Info_Entity.class)
+//            )
+//        ),
+//        @ApiResponse(
+//            responseCode = "401", 
+//            description = "Unauthorized - Authentication required"
+//        ),
+//        @ApiResponse(
+//            responseCode = "403", 
+//            description = "Forbidden - Insufficient permissions"
+//        ),
+//        @ApiResponse(
+//            responseCode = "404", 
+//            description = "Not Found - User not found"
+//        )
+//    })
+//    @GetMapping("/MyDetails")
+//    public Info_Entity MyDetails(@Parameter(hidden = true) Principal principal) {
+//        String username = principal.getName();
+//        Info_Entity user = infoRepository.findByAuthenticationUsername(username);
+//        if (user == null) {
+//            throw new UserNotFoundException("User Not Found");
+//        }
+//        user.getAuthentication().setUser(null);
+//        return user;
+//    }
+//}

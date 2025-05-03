@@ -1,0 +1,28 @@
+server.port=3333
+
+spring.application.name=CLOUD-API-GATEWAY
+
+spring.cloud.gateway.discovery.locator.enabled=true
+
+
+
+spring.cloud.gateway.routes[0].id=User-Services
+spring.cloud.gateway.routes[0].uri=http://localhost:9091
+spring.cloud.gateway.routes[0].predicates[0]=Path=/user/**
+spring.cloud.gateway.routes[0].filters[0]=RewritePath=/user/(?<remaining>.*), /${remaining}
+
+spring.cloud.gateway.routes[1].id=Admin-Services
+spring.cloud.gateway.routes[1].uri=http://localhost:9092
+spring.cloud.gateway.routes[1].predicates[0]=Path=/admin/**
+spring.cloud.gateway.routes[1].filters[0]=RewritePath=/admin/(?<remaining>.*), /${remaining}
+
+# Expose Swagger UI for multiple microservices
+springdoc.swagger-ui.urls[0].name=User-Service
+springdoc.swagger-ui.urls[0].url=/user/v3/api-docs
+
+springdoc.swagger-ui.urls[1].name=Admin-Service
+springdoc.swagger-ui.urls[1].url=/admin/v3/api-docs
+
+# Enable Swagger UI
+springdoc.swagger-ui.enabled=true
+springdoc.api-docs.enabled=true

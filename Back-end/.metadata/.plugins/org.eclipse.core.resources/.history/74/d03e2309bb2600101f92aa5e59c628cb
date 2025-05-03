@@ -1,0 +1,42 @@
+package com.main.AOPLogger;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Aspect
+@Component
+public class AopLogger {
+    
+    private static final Logger logger = LoggerFactory.getLogger(AopLogger.class);
+
+    // Define a reusable pointcut
+    @Pointcut("execution(* com.main.RestController.AuthController.login(..))")
+    public void loginPointcut() {}
+
+    @Before("loginPointcut()")
+    public void beforeLogin(JoinPoint joinPoint) {
+        logger.info("Login attempt started - username: {}", 
+                   joinPoint.getArgs().length > 0 ? joinPoint.getArgs()[0] : "unknown");
+    }
+
+    @AfterReturning(pointcut = "loginPointcut()", returning = "result")
+    public void afterSuccessfulLogin(Object result) {
+        logger.info("Login successful. Result: {}", result);
+    }
+
+    @After("loginPointcut()")
+    public void afterLoginAttempt() {
+        logger.debug("Login attempt completed (success or failure)");
+    }
+
+    @AfterThrowing(pointcut = "loginPointcut()", throwing = "ex")
+    public void afterLoginException(Exception ex) {
+        logger.error("Unauthorized login attempt. Error: {}", ex.getMessage());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Stack trace: ", ex);
+        }
+    }
+}

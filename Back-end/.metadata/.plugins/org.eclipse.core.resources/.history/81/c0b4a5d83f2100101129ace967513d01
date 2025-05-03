@@ -1,7 +1,0 @@
-package com.main.ServiceImpl;
-
-import com.main.Service.InfoServices;
-
-public class InfoServicesImpl implements InfoServices {
-
-}

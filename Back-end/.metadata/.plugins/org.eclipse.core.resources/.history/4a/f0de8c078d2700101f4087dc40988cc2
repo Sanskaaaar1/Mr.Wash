@@ -1,0 +1,445 @@
+package com.main.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+
+import com.main.Repository.InfoRepo;
+import com.main.RestController.MyRestController;
+import com.main.Service.BookingService;
+import com.main.Service.InfoServices;
+
+public class MyRestControllerJUnitTest {
+
+    private MyRestController controller;
+    private TestBookingService bookingService;
+    private TestInfoServices infoService;
+    private TestInfoRepo infoRepository;
+
+    // Test implementations of dependencies
+    class TestBookingService implements BookingService {
+        List<Booking_Entity> bookings = new ArrayList<>();
+        List<Booking_Entity> handledBookings = new ArrayList<>();
+
+        @Override
+        public List<Booking_Entity> getBookingsByStatus(String status) {
+            return bookings.stream()
+                    .filter(b -> b.getStatus().equals(status))
+                    .toList();
+        }
+
+        @Override
+        public Optional<Booking_Entity> updateByBookingid(Integer id, String status) {
+            return bookings.stream()
+                    .filter(b -> b.getBookingId().equals(id))
+                    .findFirst()
+                    .map(b -> {
+                        b.setStatus(status);
+                        return b;
+                    });
+        }
+
+        @Override
+        public List<Booking_Entity> getBookingByDate(LocalDate date) {
+            return bookings.stream()
+                    .filter(b -> b.getSlotDate().equals(date))
+                    .toList();
+        }
+
+        @Override
+        public Optional<Booking_Entity> getBookingById(Integer id) {
+            return bookings.stream()
+                    .filter(b -> b.getBookingId().equals(id))
+                    .findFirst();
+        }
+
+        @Override
+        public Booking_Entity AddEmp(Integer bookingid, String empName) {
+            return bookings.stream()
+                    .filter(b -> b.getBookingId().equals(bookingid))
+                    .findFirst()
+                    .map(b -> {
+                        b.setEmpName(empName);
+                        handledBookings.add(b);
+                        return b;
+                    })
+                    .orElse(null);
+        }
+
+        public List<Booking_Entity> getBookingsHandledByEmployee(String empName) {
+            return handledBookings.stream()
+                    .filter(b -> empName.equals(b.getEmpName()))
+                    .toList();
+        }
+    }
+
+    class TestInfoServices implements InfoServices {
+        Info_Entity user;
+
+        @Override
+        public Info_Entity getByName(String name) {
+            return user;
+        }
+
+		@Override
+		public Optional<Info_Entity> searchByInfoId(Integer id) {
+			// TODO Auto-generated method stub
+			return Optional.empty();
+		}
+    }
+
+    class TestInfoRepo implements InfoRepo {
+        Info_Entity user;
+
+        public Info_Entity findByAuthenticationUsername(String username) {
+            return user;
+        }
+
+		@Override
+		public void flush() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public <S extends Info_Entity> S saveAndFlush(S entity) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> saveAllAndFlush(Iterable<S> entities) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void deleteAllInBatch(Iterable<Info_Entity> entities) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllByIdInBatch(Iterable<Integer> ids) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllInBatch() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public Info_Entity getOne(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Info_Entity getById(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Info_Entity getReferenceById(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> findAll(Example<S> example) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> findAll(Example<S> example, Sort sort) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> saveAll(Iterable<S> entities) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Info_Entity> findAll() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Info_Entity> findAllById(Iterable<Integer> ids) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> S save(S entity) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Optional<Info_Entity> findById(Integer id) {
+			// TODO Auto-generated method stub
+			return Optional.empty();
+		}
+
+		@Override
+		public boolean existsById(Integer id) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public long count() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void deleteById(Integer id) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void delete(Info_Entity entity) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllById(Iterable<? extends Integer> ids) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAll(Iterable<? extends Info_Entity> entities) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAll() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public List<Info_Entity> findAll(Sort sort) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Page<Info_Entity> findAll(Pageable pageable) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> Optional<S> findOne(Example<S> example) {
+			// TODO Auto-generated method stub
+			return Optional.empty();
+		}
+
+		@Override
+		public <S extends Info_Entity> Page<S> findAll(Example<S> example, Pageable pageable) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> long count(Example<S> example) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public <S extends Info_Entity> boolean exists(Example<S> example) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public <S extends Info_Entity, R> R findBy(Example<S> example,
+				Function<FetchableFluentQuery<S>, R> queryFunction) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Info_Entity findByFirstNameIgnoreCase(String Name) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Info_Entity findByInfoId(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+    }
+
+    // Test security context implementation
+    static class TestSecurityContext implements SecurityContext {
+        private Authentication authentication;
+
+        public TestSecurityContext(Authentication authentication) {
+            this.authentication = authentication;
+        }
+
+        @Override
+        public Authentication getAuthentication() {
+            return authentication;
+        }
+
+        @Override
+        public void setAuthentication(Authentication authentication) {
+            this.authentication = authentication;
+        }
+    }
+
+    static class TestAuthentication implements Authentication {
+        private final String name;
+
+        public TestAuthentication(String name) {
+            this.name = name;
+        }
+
+        @Override public String getName() { return name; }
+        @Override public Object getPrincipal() { return null; }
+        @Override public Object getCredentials() { return null; }
+        @Override public Object getDetails() { return null; }
+        @Override public Collection<? extends GrantedAuthority> getAuthorities() { return null; }
+        @Override public boolean isAuthenticated() { return true; }
+        @Override public void setAuthenticated(boolean isAuthenticated) { }
+    }
+
+    @BeforeEach
+    void setUp() {
+        bookingService = new TestBookingService();
+        infoService = new TestInfoServices();
+        infoRepository = new TestInfoRepo();
+
+        controller = new MyRestController();
+        controller.bookingService = bookingService;
+        controller.infoService = infoService;
+        controller.infoRepo = infoRepository;
+
+        // Setup test security context
+        SecurityContextHolder.setContext(new TestSecurityContext(new TestAuthentication("testuser")));
+    }
+
+    @Test
+    void testSearchByStatus() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setStatus("PENDING");
+        bookingService.bookings.add(booking);
+
+        // Test
+        List<Booking_Entity> result = controller.searchByStatus("PENDING");
+
+        // Verify
+        assertEquals(1, result.size());
+        assertEquals("PENDING", result.get(0).getStatus());
+    }
+
+    @Test
+    void testUpdateById() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setBookingId(1);
+        booking.setStatus("PENDING");
+        bookingService.bookings.add(booking);
+
+        // Test
+        Optional<Booking_Entity> result = controller.updateById(1, "COMPLETED");
+
+        // Verify
+        assertTrue(result.isPresent());
+        assertEquals("COMPLETED", result.get().getStatus());
+    }
+
+    @Test
+    void testTodaysTask() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setSlotDate(LocalDate.now());
+        bookingService.bookings.add(booking);
+
+        // Test
+        List<Booking_Entity> result = controller.todaysTask();
+
+        // Verify
+        assertEquals(1, result.size());
+        assertEquals(LocalDate.now(), result.get(0).getSlotDate());
+    }
+
+    @Test
+    void testSearchByID() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setBookingId(1);
+        bookingService.bookings.add(booking);
+
+        // Test
+        Optional<Booking_Entity> result = controller.searchByID(1);
+
+        // Verify
+        assertTrue(result.isPresent());
+        assertEquals(1, result.get().getBookingId());
+    }
+
+    @Test
+    void testSearchByName() {
+        // Setup test data
+        Info_Entity user = new Info_Entity();
+        user.setFirstName("John");
+        Booking_Entity booking = new Booking_Entity();
+        user.setBookings(new ArrayList<>());
+        user.getBookings().add(booking);
+        infoService.user = user;
+
+        // Test
+        List<Booking_Entity> result = controller.searchByName("John");
+
+        // Verify
+        assertEquals(1, result.size());
+    }
+
+   
+
+  
+
+ 
+}

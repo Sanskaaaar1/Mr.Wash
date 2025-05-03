@@ -22,13 +22,13 @@ export default function SearchByID() {
       const token = localStorage.getItem('token');
       let response;
       if(role==='admin'){
-        response = await axios.get(`http://localhost:9092/adminAPI/searchByID/${bookingId}`, {
+        response = await axios.get(`http://localhost:3333/admin/adminAPI/searchByID/${bookingId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
       }else{
-        response = await axios.get(`http://localhost:9093/empAPI/searchByID/${bookingId}`, {
+        response = await axios.get(`http://localhost:3333/emp/empAPI/searchByID/${bookingId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

@@ -58,7 +58,12 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-        
+            <!-- Swagger Dependencies -->
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.5.0</version> <!-- Works with Spring Boot 3.x -->
+</dependency>
         <!-- Database -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -78,17 +83,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-          <!-- Core Logging -->
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
-        
-    </dependency>
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        </dependency>
-        <!--           gg              -->
+        <!--AOP Dependencies-->
+        <dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+          
+        <!--gg-->
         <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>

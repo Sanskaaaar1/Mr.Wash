@@ -34,13 +34,13 @@ import com.main.Validation.RegisterValidation;
 public class AuthController {
 
     @Autowired
-    private AuthService service;
+	public AuthService service;
     @Autowired
-    private InfoRepo infoRepo;
+    public InfoRepo infoRepo;
     @Autowired
-    private AuthRepo authRepo;
+    public AuthRepo authRepo;
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public BCryptPasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterValidation registers) {

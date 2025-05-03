@@ -64,7 +64,7 @@ export default function EmpForm() {
     setLoading(true);
     try {
       const role = localStorage.getItem('role');
-      await axios.post('http://localhost:9092/register', formData);
+      await axios.post('http://localhost:3333/emp/register', formData);
       alert('Account created successfully!');
       if(role==='admin'){
         navigate('/admin-dashboard')

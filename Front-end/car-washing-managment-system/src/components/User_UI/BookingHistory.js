@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UserHeader from './UserHeader';
 
 export default function BookingHistory() {
   const [history, setHistory] = useState([]);
@@ -11,7 +12,7 @@ export default function BookingHistory() {
     const fetchHistory = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get('http://localhost:9091/userAPI/history', {
+        const response = await axios.get('http://localhost:3333/user/userAPI/history', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -53,7 +54,9 @@ export default function BookingHistory() {
     return <h2 className="text-danger text-center mt-5">Unauthorized Access</h2>;
   }
   return (
+    
     <div className="bg-dark min-vh-100 p-4">
+      <UserHeader/>
       <div className="container">
         <div className="bg-secondary bg-opacity-25 shadow p-4 mb-4 rounded text-center">
           <h2 className="fw-bold text-light">My Booking History</h2>

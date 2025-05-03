@@ -35,25 +35,25 @@ import com.main.Service.AuthService;
 import com.main.Service.AuthenticationService;
 import com.main.Validator.RegisterValidation;
 
-@RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@RestController // Marks this class as a REST controller
+@CrossOrigin(origins = "http://localhost:3000") // Allows cross-origin requests from this URL
 public class AuthController {
 
     @Autowired
-    private AuthService service;
+	public AuthService service; // Service for handling authentication logic
     @Autowired
-    private InfoRepository infoRepo;
+    public  InfoRepository infoRepo; // Repository to handle Info_Entity database operations
     @Autowired
-    private AuthRepo authRepo;
+    public AuthRepo authRepo; // Repository to handle Authentication_Entity database operations
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public BCryptPasswordEncoder passwordEncoder; // Bean for password encryption
     @Autowired
-	AuthenticationService authService;
+    public AuthenticationService authService; // Service to manage authentication operations
 
+    // Endpoint for user registration
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterValidation registers) {
-       
-        // Validation checks (unchanged)
+        // Validation checks for the input fields (all fields should be valid)
         if(registers.getFirstName()==null || registers.getFirstName().trim().isEmpty()) {
             throw new FirstNameExceprtion("First Name is Required");
         }
@@ -67,7 +67,7 @@ public class AuthController {
             throw new PhoneNoNullException("PhoneNo is Required");
         }
         if(!registers.getPhoneNo().matches("[0-9]{10}")) {
-            throw new PhoneNoInValid("PhoneNo should be 10 digit");
+            throw new PhoneNoInValid("PhoneNo should be 10 digits");
         }
         if(registers.getCity()==null || registers.getCity().trim().isEmpty()) {
             throw new CityException("City is Required");
@@ -83,22 +83,22 @@ public class AuthController {
         }
         if(registers.getGender() == null || !registers.getGender().equalsIgnoreCase("male") && 
                !registers.getGender().equalsIgnoreCase("female")) {
-              throw new GenderException("Gender Shoud be MALE or FEMALE");
+              throw new GenderException("Gender should be MALE or FEMALE");
         }
         if(registers.getUsername()==null || registers.getUsername().trim().isEmpty()) {
             throw new UserNameException("User Name Required");
         }
         if(registers.getPassword()==null || registers.getPassword().trim().isEmpty()) {
-            throw new NullPassword("Pasword is Required");
+            throw new NullPassword("Password is Required");
         }
-        if(registers.getMail()==null || registers.getMail().trim().isEmpty()) {  // Fixed: was checking password instead of mail
+        if(registers.getMail()==null || registers.getMail().trim().isEmpty()) {  
             throw new NullMailException("Mail is Required");
         }
         if (!registers.getMail().matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$")) {
             throw new MailInvalidException("Mail is Invalid");
         }
-        
-        // Create and save Info_Entity first
+
+        // Create and save Info_Entity first (user details like name, city, phone, etc.)
         Info_Entity info = new Info_Entity();
         info.setFirstName(registers.getFirstName());
         info.setMiddleName(registers.getMiddleName());
@@ -110,14 +110,13 @@ public class AuthController {
         info.setPhoneNumber(Long.parseLong(registers.getPhoneNo()));
         info.setGender(Info_Entity.Gender.valueOf(registers.getGender().substring(0, 1).toUpperCase() + registers.getGender().substring(1).toLowerCase()));
 
-        
-        // Create Authentication_Entity
+        // Create Authentication_Entity (username, password, role)
         Authentication_Entity auth = new Authentication_Entity();
-        auth.setRole(Authentication_Entity.Role.USER);
+        auth.setRole(Authentication_Entity.Role.USER); // Set default user role
         auth.setUsername(registers.getUsername());
-        auth.setPassword(passwordEncoder.encode(registers.getPassword()));
+        auth.setPassword(passwordEncoder.encode(registers.getPassword())); // Encrypt password
         
-        // Establish the bidirectional relationship
+        // Establish the bidirectional relationship between Info_Entity and Authentication_Entity
         auth.setUser(info);  // Set the Info_Entity reference in Authentication_Entity
         info.setAuthentication(auth);  // Set the Authentication_Entity reference in Info_Entity
         
@@ -125,20 +124,23 @@ public class AuthController {
         info = infoRepo.save(info);  // Save Info_Entity first to generate ID
         authRepo.save(auth);         // Then save Authentication_Entity with the reference
         
-        return ResponseEntity.ok("Account created successfully!");
+        return ResponseEntity.ok("Account created successfully!"); // Success response
     }
 
+    // Endpoint for user login (verifies user credentials)
     @PostMapping("/login")
     public  String login(@RequestBody Authentication_Entity user) {
-    	return service.verify(user);
+        return service.verify(user); // Call service to verify user credentials
     }
+
+    // Endpoint to search for user by username
     @GetMapping("/SearchUsername/{username}")
-	public ResponseEntity<?> searchByUsername(@PathVariable String username) {
-	    Optional<Authentication_Entity> authOptional = authService.findByUsername(username);
-	    if (authOptional.isPresent()) {
-	        return ResponseEntity.ok(authOptional.get());
-	    } else {
-	        return ResponseEntity.ok(null); // or 404 if you want
-	    }
-	}
+    public ResponseEntity<?> searchByUsername(@PathVariable String username) {
+        Optional<Authentication_Entity> authOptional = authService.findByUsername(username);
+        if (authOptional.isPresent()) {
+            return ResponseEntity.ok(authOptional.get()); // If user found, return details
+        } else {
+            return ResponseEntity.ok(null); // If user not found, return null or 404
+        }
+    }
 }

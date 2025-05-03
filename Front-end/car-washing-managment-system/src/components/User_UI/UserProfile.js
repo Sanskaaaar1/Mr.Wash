@@ -18,7 +18,7 @@ export default function UserProfile() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:9091/userAPI/MyDetails', {
+        const response = await axios.get('http://localhost:3333/user/userAPI/MyDetails', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUserData(response.data);

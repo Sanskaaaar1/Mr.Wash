@@ -1,0 +1,295 @@
+package com.main.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Exception.UserNotFoundException;
+import com.main.Repository.InfoRepo;
+import com.main.RestController.MyRestController;
+import com.main.Service.BookingService;
+import com.main.Service.InfoServices;
+
+public class MyRestControllerJUnitTest {
+
+    private MyRestController controller;
+    private TestBookingService bookingService;
+    private TestInfoServices infoService;
+    private TestInfoRepo infoRepository;
+
+    // Test implementations of dependencies
+    class TestBookingService implements BookingService {
+        List<Booking_Entity> bookings = new ArrayList<>();
+        List<Booking_Entity> handledBookings = new ArrayList<>();
+
+        @Override
+        public List<Booking_Entity> getBookingsByStatus(String status) {
+            return bookings.stream()
+                    .filter(b -> b.getStatus().equals(status))
+                    .toList();
+        }
+
+        @Override
+        public Optional<Booking_Entity> updateByBookingid(Integer id, String status) {
+            return bookings.stream()
+                    .filter(b -> b.getBookingId().equals(id))
+                    .findFirst()
+                    .map(b -> {
+                        b.setStatus(status);
+                        return b;
+                    });
+        }
+
+        @Override
+        public List<Booking_Entity> getBookingByDate(LocalDate date) {
+            return bookings.stream()
+                    .filter(b -> b.getSlotDate().equals(date))
+                    .toList();
+        }
+
+        @Override
+        public Optional<Booking_Entity> getBookingById(Integer id) {
+            return bookings.stream()
+                    .filter(b -> b.getBookingId().equals(id))
+                    .findFirst();
+        }
+
+        @Override
+        public Booking_Entity AddEmp(Integer bookingid, String empName) {
+            return bookings.stream()
+                    .filter(b -> b.getId().equals(bookingid))
+                    .findFirst()
+                    .map(b -> {
+                        b.setEmpName(empName);
+                        handledBookings.add(b);
+                        return b;
+                    })
+                    .orElse(null);
+        }
+
+        @Override
+        public List<Booking_Entity> getBookingsHandledByEmployee(String empName) {
+            return handledBookings.stream()
+                    .filter(b -> empName.equals(b.getEmpName()))
+                    .toList();
+        }
+    }
+
+    class TestInfoServices extends InfoServices {
+        Info_Entity user;
+
+        @Override
+        public Info_Entity getByName(String name) {
+            return user;
+        }
+    }
+
+    class TestInfoRepo extends InfoRepo {
+        Info_Entity user;
+
+        @Override
+        public Info_Entity findByAuthenticationUsername(String username) {
+            return user;
+        }
+    }
+
+    // Test security context implementation
+    static class TestSecurityContext implements SecurityContext {
+        private Authentication authentication;
+
+        public TestSecurityContext(Authentication authentication) {
+            this.authentication = authentication;
+        }
+
+        @Override
+        public Authentication getAuthentication() {
+            return authentication;
+        }
+
+        @Override
+        public void setAuthentication(Authentication authentication) {
+            this.authentication = authentication;
+        }
+    }
+
+    static class TestAuthentication implements Authentication {
+        private final String name;
+
+        public TestAuthentication(String name) {
+            this.name = name;
+        }
+
+        @Override public String getName() { return name; }
+        @Override public Object getPrincipal() { return null; }
+        @Override public Object getCredentials() { return null; }
+        @Override public Object getDetails() { return null; }
+        @Override public Collection<? extends GrantedAuthority> getAuthorities() { return null; }
+        @Override public boolean isAuthenticated() { return true; }
+        @Override public void setAuthenticated(boolean isAuthenticated) { }
+    }
+
+    @BeforeEach
+    void setUp() {
+        bookingService = new TestBookingService();
+        infoService = new TestInfoServices();
+        infoRepository = new TestInfoRepo();
+
+        controller = new MyRestController();
+        controller.bookingService = bookingService;
+        controller.infoService = infoService;
+        controller.infoRepository = infoRepository;
+
+        // Setup test security context
+        SecurityContextHolder.setContext(new TestSecurityContext(new TestAuthentication("testuser")));
+    }
+
+    @Test
+    void testSearchByStatus() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setStatus("PENDING");
+        bookingService.bookings.add(booking);
+
+        // Test
+        List<Booking_Entity> result = controller.searchByStatus("PENDING");
+
+        // Verify
+        assertEquals(1, result.size());
+        assertEquals("PENDING", result.get(0).getStatus());
+    }
+
+    @Test
+    void testUpdateById() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setId(1);
+        booking.setStatus("PENDING");
+        bookingService.bookings.add(booking);
+
+        // Test
+        Optional<Booking_Entity> result = controller.updateById(1, "COMPLETED");
+
+        // Verify
+        assertTrue(result.isPresent());
+        assertEquals("COMPLETED", result.get().getStatus());
+    }
+
+    @Test
+    void testTodaysTask() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setSlotDate(LocalDate.now());
+        bookingService.bookings.add(booking);
+
+        // Test
+        List<Booking_Entity> result = controller.todaysTask();
+
+        // Verify
+        assertEquals(1, result.size());
+        assertEquals(LocalDate.now(), result.get(0).getSlotDate());
+    }
+
+    @Test
+    void testSearchByID() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setId(1);
+        bookingService.bookings.add(booking);
+
+        // Test
+        Optional<Booking_Entity> result = controller.searchByID(1);
+
+        // Verify
+        assertTrue(result.isPresent());
+        assertEquals(1, result.get().getId());
+    }
+
+    @Test
+    void testSearchByName() {
+        // Setup test data
+        Info_Entity user = new Info_Entity();
+        user.setFirstName("John");
+        Booking_Entity booking = new Booking_Entity();
+        user.setBookings(new ArrayList<>());
+        user.getBookings().add(booking);
+        infoService.user = user;
+
+        // Test
+        List<Booking_Entity> result = controller.searchByName("John");
+
+        // Verify
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testMyDetails_Success() {
+        // Setup test data
+        Info_Entity user = new Info_Entity();
+        infoRepository.user = user;
+
+        // Test
+        Info_Entity result = controller.MyDetails();
+
+        // Verify
+        assertNotNull(result);
+    }
+
+    @Test
+    void testMyDetails_UserNotFound() {
+        // Setup test data
+        infoRepository.user = null;
+
+        // Test and Verify
+        assertThrows(UserNotFoundException.class, () -> {
+            controller.MyDetails();
+        });
+    }
+
+    @Test
+    void testAddEmpName() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setId(1);
+        bookingService.bookings.add(booking);
+        
+        Info_Entity user = new Info_Entity();
+        user.setFirstName("Test");
+        infoRepository.user = user;
+
+        // Test
+        Booking_Entity result = controller.addEmpName(1);
+
+        // Verify
+        assertNotNull(result);
+        assertEquals("Test (Emp)", result.getEmpName());
+    }
+
+    @Test
+    void testGetMyHandledBookings() {
+        // Setup test data
+        Booking_Entity booking = new Booking_Entity();
+        booking.setEmpName("Test (Emp)");
+        bookingService.handledBookings.add(booking);
+        
+        Info_Entity user = new Info_Entity();
+        user.setFirstName("Test");
+        infoRepository.user = user;
+
+        // Test
+        List<Booking_Entity> result = controller.getMyHandledBookings();
+
+        // Verify
+        assertEquals(1, result.size());
+        assertEquals("Test (Emp)", result.get(0).getEmpName());
+    }
+}

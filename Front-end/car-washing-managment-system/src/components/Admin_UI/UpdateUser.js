@@ -35,7 +35,7 @@ export default function UpdateUser() {
     setLoading(true);
     setUserData(null);
     try {
-      const response = await axios.get(`http://localhost:9092/adminAPI/searchByInfoId/${searchId}`, {
+      const response = await axios.get(`http://localhost:3333/admin/adminAPI/searchByInfoId/${searchId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -84,7 +84,7 @@ export default function UpdateUser() {
         mail: formData.mail || userData.email,
       };
 
-      await axios.post(`http://localhost:9092/adminAPI/UpdateUser/${searchId}`, updatedData, {
+      await axios.post(`http://localhost:3333/admin/adminAPI/UpdateUser/${searchId}`, updatedData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

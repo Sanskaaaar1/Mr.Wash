@@ -1,0 +1,15 @@
+2025-05-02 00:33:53 [http-nio-9091-exec-1] INFO  o.a.c.c.C.[Tomcat-5].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-02 00:33:53 [http-nio-9091-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-05-02 00:33:53 [http-nio-9091-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2025-05-02 00:33:55 [http-nio-9091-exec-1] INFO  com.main.AOPLogger.AopLogger - Login successful. Result: eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiVGFtYW5uYUAxMjMiLCJpYXQiOjE3NDYxMjYyMzUsImV4cCI6MTc0NjEyOTgzNX0.niFJhT3uhd04hJpFTBvIUeBGl9mbAsy1h2tP7FviYCY
+2025-05-02 00:34:10 [http-nio-9091-exec-2] INFO  com.main.AOPLogger.AopLogger - User 'Tamanna@123' accessing personal details
+2025-05-02 00:34:10 [http-nio-9091-exec-2] INFO  com.main.AOPLogger.AopLogger - Returned user details for: Tamanna Randive
+2025-05-02 00:34:10 [http-nio-9091-exec-3] INFO  com.main.AOPLogger.AopLogger - User 'Tamanna@123' accessing personal details
+2025-05-02 00:34:10 [http-nio-9091-exec-3] INFO  com.main.AOPLogger.AopLogger - Returned user details for: Tamanna Randive
+2025-05-02 00:35:16 [http-nio-9091-exec-6] INFO  com.main.AOPLogger.AopLogger - User 'Tamanna@123' accessing booking history
+2025-05-02 00:35:16 [http-nio-9091-exec-6] INFO  com.main.AOPLogger.AopLogger - Returned 2 booking records
+2025-05-02 00:35:16 [http-nio-9091-exec-7] INFO  com.main.AOPLogger.AopLogger - User 'Tamanna@123' accessing booking history
+2025-05-02 00:35:16 [http-nio-9091-exec-7] INFO  com.main.AOPLogger.AopLogger - Returned 2 booking records
+2025-05-02 00:36:58 [AsyncResolver-bootstrap-executor-%d] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-02 00:41:58 [AsyncResolver-bootstrap-executor-%d] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2025-05-02 00:46:58 [AsyncResolver-bootstrap-executor-%d] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration

@@ -13,7 +13,7 @@ export default function RequestedList() {
   const fetchRequestedBookings = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:9092/adminAPI/status/REQUESTED`, {
+      const response = await axios.get(`http://localhost:3333/admin/adminAPI/status/REQUESTED`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export default function RequestedList() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:9092/adminAPI/updateSlot/${bookingId}/${date}/${time}`,
+        `http://localhost:3333/admin/adminAPI/updateSlot/${bookingId}/${date}/${time}`,
         {},
         {
           headers: {
@@ -78,7 +78,7 @@ export default function RequestedList() {
         }
       );
       await axios.put(
-        `http://localhost:9092/adminAPI/update/${bookingId}/SCHEDULED`,
+        `http://localhost:3333/admin/adminAPI/update/${bookingId}/SCHEDULED`,
         {},
         {
           headers: {
@@ -97,7 +97,7 @@ export default function RequestedList() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:9092/adminAPI/update/${bookingId}/CANCEL`,
+        `http://localhost:3333/admin/adminAPI/update/${bookingId}/CANCEL`,
         {},
         {
           headers: {

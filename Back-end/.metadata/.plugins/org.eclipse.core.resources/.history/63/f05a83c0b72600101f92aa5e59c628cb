@@ -1,0 +1,6 @@
+package com.main.AOPLogger;
+@Aspect
+@Component
+public class AopLogger {
+
+}

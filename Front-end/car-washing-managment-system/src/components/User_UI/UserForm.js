@@ -64,7 +64,7 @@ export default function UserForm() {
     if (name === 'username') {
       if (value.trim().length > 2) { // only check if username length > 2
         try {
-          const response = await axios.get(`http://localhost:9091/SearchUsername/${value}`);
+          const response = await axios.get(`http://localhost:3333/user/SearchUsername/${value}`);
           console.log(response.data);
           if (response.data) {
             setUsernameAvailable(false); // username already exists
@@ -87,7 +87,7 @@ export default function UserForm() {
     setLoading(true);
     try {
       const role = localStorage.getItem('role');
-      const response = await axios.post('http://localhost:9091/register', formData);
+      const response = await axios.post('http://localhost:3333/user/register', formData);
       alert('Successfully Created New Account');
       if(role==='admin'){
         navigate('/admin-dashboard')

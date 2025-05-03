@@ -32,16 +32,17 @@ import com.main.Validation.RegisterValidation;
 @CrossOrigin(origins = "http://localhost:3000")
 public class MyRestController {
 	@Autowired
-	BookingService bookingService;
+	
+	public BookingService bookingService;
 	
 	@Autowired
-	InfoServices infoService;
+	public InfoServices infoService;
 	
 	@Autowired
-	InfoRepo infoRepo;
+	public InfoRepo infoRepo;
 	
 	@Autowired
-	BookingRepository bookingRepository;
+	public BookingRepository bookingRepository;
 	
 	@GetMapping("/status/{stus}")
 	public List<Booking_Entity> searchByStatus(@PathVariable String stus  ) {

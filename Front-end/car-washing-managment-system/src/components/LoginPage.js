@@ -31,11 +31,11 @@ export default function LoginPage() {
     try {
       let url = '';
       if (showForm === "user") {
-        url = 'http://localhost:9091/login';
+        url = 'http://localhost:3333/user/login';
       } else if (showForm === "emp") {
-        url = 'http://localhost:9093/login';
+        url = 'http://localhost:3333/emp/login';
       } else if (showForm === "admin") {
-        url = 'http://localhost:9092/login'; 
+        url = 'http://localhost:3333/admin/login'; 
       }
       const response = await axios.post(url, loginData);
       const token = response.data;

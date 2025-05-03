@@ -27,13 +27,15 @@ import com.main.Service.InfoServices;
 @CrossOrigin(origins = "http://localhost:3000")
 public class MyRestController {
 	@Autowired
-	BookingService bookingService;
+
+	public BookingService bookingService;
 	
 	@Autowired
-	InfoServices infoService;
+	public InfoServices infoService;
 	
 	@Autowired
-	InfoRepo infoRepository;
+	public InfoRepo infoRepository;
+	
 	
 	
 	@GetMapping("/status/{stus}")
@@ -66,12 +68,13 @@ public class MyRestController {
 	@GetMapping("/MyDetails")
 	public Info_Entity MyDetails() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-	    String username = authentication.getName();  
+	    String username = authentication.getName(); 
+	    //username=username+" (Emp)";
 	Info_Entity user =infoRepository.findByAuthenticationUsername(username);
 	if(user==null) {
 		throw new UserNotFoundException("User Not Found");
 	}
-	user.getAuthentication().setUser(null);
+	user.getAuthentication().setPassword(null);
 	return user;
 	}
 	
@@ -89,7 +92,8 @@ public class MyRestController {
 	public List<Booking_Entity> getMyHandledBookings() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    String empName = authentication.getName(); 
-
+	    Info_Entity user =infoRepository.findByAuthenticationUsername(empName);
+	    empName=user.getFirstName()+" (Emp)";
 	    List<Booking_Entity> bookings = bookingService.getBookingsHandledByEmployee(empName);
 
 

@@ -1,4 +1,5 @@
 package com.main.RestController;
+
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.security.Principal;
@@ -42,46 +43,50 @@ import com.main.Validator.BookingValidation;
 
 import jakarta.validation.Valid;
 
-@RestController
-@RequestMapping("/userAPI")
-//@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "http://localhost:3000")
+@RestController // Marks this class as a REST controller
+@RequestMapping("/userAPI") // Defines the base URL for the user-related endpoints
+@CrossOrigin(origins = "http://localhost:3000") // Allows cross-origin requests from this URL
 public class MyRestController {
-	@Autowired
-	BookingRepository bookingRepository;
-	@Autowired
-	InfoRepository infoRepository;
-	@Autowired
-	BookingService bookingService;
-	@Autowired
-	AuthenticationService authService;
 	
+	@Autowired
+	public BookingRepository bookingRepository; // Repository for handling booking entity database operations
 	
+	@Autowired
+	public InfoRepository infoRepository; // Repository for handling info entity database operations
 	
+	@Autowired
+	public BookingService bookingService; // Service for handling business logic related to bookings
+	
+	@Autowired
+	public AuthenticationService authService; // Service for handling authentication operations
+
+	// Endpoint to fetch booking history for the authenticated user
 	@GetMapping("/history")
 	public List<Booking_Entity> MyHistory(Principal principal) {
-		String username=principal.getName();
-		List<Booking_Entity> lists=bookingService.getByUserHistory(username);
-		for(Booking_Entity b:lists) {
-			b.setUser(null);
+		String username = principal.getName(); // Get the username of the authenticated user
+		List<Booking_Entity> lists = bookingService.getByUserHistory(username); // Fetch the user's booking history
+		for (Booking_Entity b : lists) {
+			b.setUser(null); // Remove sensitive user data from the response
 		}
-		return lists;
+		return lists; // Return the booking history
 	}
-	@PostMapping("/slotBooking")
-	public ResponseEntity<?> SlotBooking( @RequestBody  BookingValidation bookingValidation,Principal principal ) {
-		Booking_Entity booking=new Booking_Entity();
-	
 
+	// Endpoint to book a slot for a vehicle service
+	@PostMapping("/slotBooking")
+	public ResponseEntity<?> SlotBooking(@RequestBody BookingValidation bookingValidation, Principal principal) {
+		Booking_Entity booking = new Booking_Entity(); // Create a new booking entity
+
+		// Validate input fields for vehicle type, company, name, services, etc.
     	if (bookingValidation.getVehicleType() == null || bookingValidation.getVehicleType().trim().isEmpty()) {
     	    throw new VehicleTypeException("Vehicle type is required");
     	}
 
     	if (bookingValidation.getVehicleCompany() == null || bookingValidation.getVehicleCompany().trim().isEmpty()) {
-    	   throw new VehicleCompanyException( "Vehicle Company is required");
+    	   throw new VehicleCompanyException("Vehicle Company is required");
     	}
 
     	if (bookingValidation.getVehicleName() == null || bookingValidation.getVehicleName().trim().isEmpty()) {
-    	    throw new VehicleNameException( "Vehicle Name is required");
+    	    throw new VehicleNameException("Vehicle Name is required");
     	}
 
     	if (bookingValidation.getServices() == null || bookingValidation.getServices().trim().isEmpty()) {
@@ -110,11 +115,11 @@ public class MyRestController {
     	    throw new DateFutureException("Date must be in the future");
     	}
 
-    
-    	
-    	String username=principal.getName();
-    	Info_Entity user =infoRepository.findByAuthenticationUsername(username);
+    	// Get user information from the principal (currently authenticated user)
+    	String username = principal.getName();
+    	Info_Entity user = infoRepository.findByAuthenticationUsername(username);
        
+    	// Set the booking details from the validated input
     	booking.setUser(user);
     	booking.setVehicleType(bookingValidation.getVehicleType());
     	booking.setVehicleCompany(bookingValidation.getVehicleCompany());
@@ -125,25 +130,23 @@ public class MyRestController {
     	booking.setServiceType(bookingValidation.getServices());
     	booking.setBookingDate(LocalDate.now());
     	booking.setBookingTime(LocalTime.now());
-    	booking.setStatus("REQUESTED");
-    	//System.out.println(bookingValidation);
-    	bookingRepository.save(booking);
+    	booking.setStatus("REQUESTED"); // Set initial status as requested
     	
-		return ResponseEntity.ok("Booking created successfully");
-	}
-	
-		@GetMapping("/MyDetails")
-			public Info_Entity MyDetails(Principal principal) {
-			String username=principal.getName();
-	    	Info_Entity user =infoRepository.findByAuthenticationUsername(username);
-	    	if(user==null) {
-	    		throw new UserNotFoundException("User Not Found");
-	    	}
-	    	user.getAuthentication().setUser(null);
-			return user;
-		}
-		
-		
+    	// Save the booking to the database
+    	bookingRepository.save(booking);
 
+		return ResponseEntity.ok("Booking created successfully"); // Return success response
 	}
 
+	// Endpoint to fetch details of the authenticated user
+	@GetMapping("/MyDetails")
+	public Info_Entity MyDetails(Principal principal) {
+		String username = principal.getName(); // Get the username of the authenticated user
+    	Info_Entity user = infoRepository.findByAuthenticationUsername(username); // Fetch user details
+    	if (user == null) {
+    		throw new UserNotFoundException("User Not Found"); // If user is not found, throw an exception
+    	}
+    	user.getAuthentication().setPassword(null); // Remove sensitive authentication data
+		return user; // Return user details
+	}
+}
