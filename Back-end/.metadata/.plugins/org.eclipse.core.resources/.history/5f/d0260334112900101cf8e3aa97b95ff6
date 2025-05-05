@@ -1,0 +1,136 @@
+package com.main;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import com.main.Entity.Authentication_Entity;
+import com.main.Entity.Booking_Entity;
+import com.main.Repository.AuthRepo;
+import com.main.Service.AuthService;
+import com.main.Service.AuthenticationService;
+import com.main.Service.BookingService;
+import com.main.Service.JWTService;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+class UserServicesApplicationTests {
+
+    @Mock
+    private AuthRepo authRepo;
+
+    @Mock
+    private JWTService jwtService;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @Mock
+    private AuthenticationService authenticationService;
+
+    @Mock
+    private BookingService bookingService;
+
+    @InjectMocks
+    private AuthService authService;
+
+    private Authentication_Entity testUser;
+
+    @BeforeEach
+    void setUp() {
+        testUser = new Authentication_Entity();
+        testUser.setUsername("testuser");
+        testUser.setPassword("password123");
+    }
+
+    @Test
+    void contextLoads() {
+        // Spring context load test
+    }
+
+//    @Test
+//    void registerUser_Success() {
+//        String encodedPassword = "encodedPassword123";
+//        when(passwordEncoder.encode(testUser.getPassword())).thenReturn(encodedPassword);
+//        when(authRepo.save(testUser)).thenReturn(testUser);
+//
+//        Authentication_Entity result = authService.register(testUser);
+//
+//        assertNotNull(result);
+//        assertEquals(encodedPassword, result.getPassword());
+//        verify(passwordEncoder).encode(testUser.getPassword());
+//        verify(authRepo).save(testUser);
+ //   }
+
+    @Test
+    void verifyUser_Success() {
+        String token = "generated.jwt.token";
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(testUser.getUsername(), testUser.getPassword()))
+        ).thenReturn(authentication);
+        when(jwtService.generateToken(testUser.getUsername())).thenReturn(token);
+
+        String result = authService.verify(testUser);
+
+        assertEquals(token, result);
+        verify(authenticationManager).authenticate(any());
+        verify(jwtService).generateToken(testUser.getUsername());
+    }
+
+    @Test
+    void verifyUser_Failure() {
+        when(authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(testUser.getUsername(), testUser.getPassword()))
+        ).thenThrow(new BadCredentialsException("Invalid credentials"));
+
+        String result = authService.verify(testUser);
+
+        assertEquals("fail", result);
+        verify(authenticationManager).authenticate(any());
+        verify(jwtService, never()).generateToken(any());
+    }
+
+    @Test
+    void findByUsername_ReturnsUser() {
+        when(authenticationService.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+
+        Optional<Authentication_Entity> result = authenticationService.findByUsername("testuser");
+
+        assertTrue(result.isPresent());
+        assertEquals("testuser", result.get().getUsername());
+    }
+
+    @Test
+    void getByUserHistory_ReturnsBookingList() {
+        Booking_Entity booking1 = new Booking_Entity();
+        Booking_Entity booking2 = new Booking_Entity();
+        when(bookingService.getByUserHistory("testuser")).thenReturn(Arrays.asList(booking1, booking2));
+
+        List<Booking_Entity> result = bookingService.getByUserHistory("testuser");
+
+        assertEquals(2, result.size());
+    }
+}

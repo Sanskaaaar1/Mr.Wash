@@ -14,13 +14,17 @@ import com.main.Entity.Booking_Entity;
 import jakarta.transaction.Transactional;
 
 public interface BookingRepository extends JpaRepository<Booking_Entity, Integer> {
+	// Getting list of Booking By status
     List<Booking_Entity> findByStatus(String status);
     
+    //Getting Booking by Booking ID
     Optional<Booking_Entity>  findById(Integer id);
     
+    //Getting list Of Booking BY Date
     @Query("SELECT b FROM Booking_Entity b WHERE b.slotDate = :date")
     List<Booking_Entity> getBookingsByDate(@Param("date") LocalDate slotDate);
 
+    //Updating EmpName in Booking 
     @Modifying
 	 @Transactional
 	 @Query("UPDATE Booking_Entity b SET b.empName = :empName WHERE b.bookingId = :bookingid")

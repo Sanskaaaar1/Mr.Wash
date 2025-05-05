@@ -1,0 +1,658 @@
+package com.main.Testing;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import com.main.Entity.Authentication_Entity;
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Exception.*;
+import com.main.Repository.BookingRepository;
+import com.main.Repository.InfoRepository;
+import com.main.RestController.MyRestController;
+import com.main.Service.BookingService;
+import com.main.Validator.BookingValidation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
+import org.springframework.http.ResponseEntity;
+
+public class MyRestControllerTest {
+
+    private MyRestController controller;
+    private Principal principal;
+    private BookingValidation validBooking;
+    private TestBookingRepository testBookingRepository;
+    private TestInfoRepository testInfoRepository;
+    private TestBookingService testBookingService;
+
+    // Simple test implementations of repositories
+    class TestBookingRepository implements BookingRepository {
+        List<Booking_Entity> bookings = new ArrayList<>();
+
+        @Override
+        public Booking_Entity save(Booking_Entity booking) {
+            bookings.add(booking);
+            return booking;
+        }
+
+        @Override
+        public List<Booking_Entity> findAll() {
+            return bookings;
+        }
+
+		@Override
+		public void flush() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public <S extends Booking_Entity> S saveAndFlush(S entity) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Booking_Entity> List<S> saveAllAndFlush(Iterable<S> entities) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void deleteAllInBatch(Iterable<Booking_Entity> entities) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllByIdInBatch(Iterable<Integer> ids) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllInBatch() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public Booking_Entity getOne(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Booking_Entity getById(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Booking_Entity getReferenceById(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Booking_Entity> List<S> findAll(Example<S> example) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Booking_Entity> List<S> findAll(Example<S> example, Sort sort) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Booking_Entity> List<S> saveAll(Iterable<S> entities) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Booking_Entity> findAllById(Iterable<Integer> ids) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Optional<Booking_Entity> findById(Integer id) {
+			// TODO Auto-generated method stub
+			return Optional.empty();
+		}
+
+		@Override
+		public boolean existsById(Integer id) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public long count() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void deleteById(Integer id) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void delete(Booking_Entity entity) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllById(Iterable<? extends Integer> ids) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAll(Iterable<? extends Booking_Entity> entities) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAll() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public List<Booking_Entity> findAll(Sort sort) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Page<Booking_Entity> findAll(Pageable pageable) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Booking_Entity> Optional<S> findOne(Example<S> example) {
+			// TODO Auto-generated method stub
+			return Optional.empty();
+		}
+
+		@Override
+		public <S extends Booking_Entity> Page<S> findAll(Example<S> example, Pageable pageable) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Booking_Entity> long count(Example<S> example) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public <S extends Booking_Entity> boolean exists(Example<S> example) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public <S extends Booking_Entity, R> R findBy(Example<S> example,
+				Function<FetchableFluentQuery<S>, R> queryFunction) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Booking_Entity> findByUser(Info_Entity user) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Booking_Entity> getByUserHistory(String username) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public int AddEmp(Integer bookingid, String empName) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+    }
+
+    class TestInfoRepository implements InfoRepository {
+        Info_Entity user;
+
+        @Override
+        public Info_Entity findByAuthenticationUsername(String username) {
+            return user;
+        }
+
+		@Override
+		public void flush() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public <S extends Info_Entity> S saveAndFlush(S entity) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> saveAllAndFlush(Iterable<S> entities) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void deleteAllInBatch(Iterable<Info_Entity> entities) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllByIdInBatch(Iterable<Integer> ids) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllInBatch() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public Info_Entity getOne(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Info_Entity getById(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Info_Entity getReferenceById(Integer id) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> findAll(Example<S> example) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> findAll(Example<S> example, Sort sort) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> List<S> saveAll(Iterable<S> entities) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Info_Entity> findAll() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public List<Info_Entity> findAllById(Iterable<Integer> ids) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> S save(S entity) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Optional<Info_Entity> findById(Integer id) {
+			// TODO Auto-generated method stub
+			return Optional.empty();
+		}
+
+		@Override
+		public boolean existsById(Integer id) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public long count() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void deleteById(Integer id) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void delete(Info_Entity entity) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAllById(Iterable<? extends Integer> ids) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAll(Iterable<? extends Info_Entity> entities) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void deleteAll() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public List<Info_Entity> findAll(Sort sort) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Page<Info_Entity> findAll(Pageable pageable) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> Optional<S> findOne(Example<S> example) {
+			// TODO Auto-generated method stub
+			return Optional.empty();
+		}
+
+		@Override
+		public <S extends Info_Entity> Page<S> findAll(Example<S> example, Pageable pageable) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public <S extends Info_Entity> long count(Example<S> example) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public <S extends Info_Entity> boolean exists(Example<S> example) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public <S extends Info_Entity, R> R findBy(Example<S> example,
+				Function<FetchableFluentQuery<S>, R> queryFunction) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public boolean existsByEmail(String email) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+    }
+
+    class TestBookingService implements BookingService {
+        @Override
+        public List<Booking_Entity> getByUserHistory(String username) {
+            List<Booking_Entity> userBookings = new ArrayList<>();
+            for (Booking_Entity b : testBookingRepository.bookings) {
+                if (b.getUser() != null && b.getUser().getAuthentication() != null && 
+                    b.getUser().getAuthentication().getUsername().equals(username)) {
+                    userBookings.add(b);
+                }
+            }
+            return userBookings;
+        }
+    }
+
+    @BeforeEach
+    void setUp() {
+        testBookingRepository = new TestBookingRepository();
+        testInfoRepository = new TestInfoRepository();
+        testBookingService = new TestBookingService();
+        
+        controller = new MyRestController();
+        controller.bookingRepository = testBookingRepository;
+        controller.infoRepository = testInfoRepository;
+        controller.bookingService = testBookingService;
+        
+        principal = () -> "testuser";
+
+        // Setup test user
+        Info_Entity user = new Info_Entity();
+        Authentication_Entity auth = new Authentication_Entity();
+        auth.setUsername("testuser");
+        user.setAuthentication(auth);
+        testInfoRepository.user = user;
+
+        // Setup valid booking data
+        validBooking = new BookingValidation();
+        validBooking.setVehicleType("Car");
+        validBooking.setVehicleCompany("Toyota");
+        validBooking.setVehicleName("Camry");
+        validBooking.setVehicleNumber("MH 12 AB 1234");
+        validBooking.setDate(LocalDate.now().plusDays(1));
+        validBooking.setTime(LocalTime.of(11, 0));
+        validBooking.setServices("Oil Change");
+    }
+
+    // Test for MyHistory endpoint
+    @Test
+    void testMyHistory_Success() {
+        // Add a test booking
+        Booking_Entity booking = new Booking_Entity();
+        booking.setUser(testInfoRepository.user);
+        testBookingRepository.save(booking);
+
+        List<Booking_Entity> result = controller.MyHistory(principal);
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getUser()); // Verify user data is removed
+    }
+
+    @Test
+    void testMyHistory_EmptyList() {
+        List<Booking_Entity> result = controller.MyHistory(principal);
+        assertTrue(result.isEmpty());
+    }
+
+    // Test for SlotBooking endpoint - success case
+    @Test
+    void testSlotBooking_Success() {
+        ResponseEntity<?> response = controller.SlotBooking(validBooking, principal);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Booking created successfully", response.getBody());
+        assertEquals(1, testBookingRepository.bookings.size());
+        
+        Booking_Entity savedBooking = testBookingRepository.bookings.get(0);
+        assertEquals("Car", savedBooking.getVehicleType());
+        assertEquals("REQUESTED", savedBooking.getStatus());
+    }
+
+    // Test validation scenarios for SlotBooking
+    @Test
+    void testSlotBooking_VehicleTypeMissing() {
+        validBooking.setVehicleType(null);
+        
+        Exception exception = assertThrows(VehicleTypeException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Vehicle type is required", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_VehicleCompanyMissing() {
+        validBooking.setVehicleCompany(null);
+        
+        Exception exception = assertThrows(VehicleCompanyException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Vehicle Company is required", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_VehicleNameMissing() {
+        validBooking.setVehicleName(null);
+        
+        Exception exception = assertThrows(VehicleNameException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Vehicle Name is required", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_ServicesMissing() {
+        validBooking.setServices(null);
+        
+        Exception exception = assertThrows(ServicesException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Service type is required", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_InvalidVehicleNumber() {
+        validBooking.setVehicleNumber("INVALID");
+        
+        Exception exception = assertThrows(NumberInvalidException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Invalid format. Example: MH 12 AB 1234", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_TimeBefore10AM() {
+        validBooking.setTime(LocalTime.of(9, 0));
+        
+        Exception exception = assertThrows(TimeBeforeException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Time must be after 10 AM", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_TimeAfter6PM() {
+        validBooking.setTime(LocalTime.of(19, 0));
+        
+        Exception exception = assertThrows(TimeAfterException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Time must be before 6 PM", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_TimeMissing() {
+        validBooking.setTime(null);
+        
+        Exception exception = assertThrows(TimeRequiredException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Time is required", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_DateMissing() {
+        validBooking.setDate(null);
+        
+        Exception exception = assertThrows(DateRequiredException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Date is required", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_DateInPast() {
+        validBooking.setDate(LocalDate.now().minusDays(1));
+        
+        Exception exception = assertThrows(DateFutureException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Date must be in the future", exception.getMessage());
+    }
+
+    @Test
+    void testSlotBooking_DateToday() {
+        validBooking.setDate(LocalDate.now());
+        
+        Exception exception = assertThrows(DateFutureException.class, () -> {
+            controller.SlotBooking(validBooking, principal);
+        });
+        
+        assertEquals("Date must be in the future", exception.getMessage());
+    }
+
+//    // Test for MyDetails endpoint
+//    @Test
+//    void testMyDetails_Success() {
+//        Info_Entity result = controller.MyDetails(principal);
+//        
+//        assertNotNull(result);
+//        assertNull(result.getAuthentication()); // Verify auth data is removed
+//    }
+
+    @Test
+    void testMyDetails_UserNotFound() {
+        testInfoRepository.user = null; // No user exists
+        
+        Exception exception = assertThrows(UserNotFoundException.class, () -> {
+            controller.MyDetails(principal);
+        });
+        
+        assertEquals("User Not Found", exception.getMessage());
+    }
+}

@@ -17,7 +17,7 @@ export default function UserDashboard() {
 
   return (
     <div className="bg-dark min-vh-100 ">
-      <UserHeader />
+      <UserHeader/>
 
       <div className="container py-5 ">
         {/*<h2 className="text-center mb-5 text-light fw-bold"></h2>*/}

@@ -27,6 +27,7 @@ public class AuthService {
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
+
     public Authentication_Entity register(Authentication_Entity user) {
         user.setPassword(encoder.encode(user.getPassword()));
         repo.save(user);

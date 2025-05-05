@@ -1,0 +1,108 @@
+package com.main;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import com.main.Entity.Authentication_Entity;
+import com.main.Repository.AuthRepo;
+import com.main.Service.AuthService;
+import com.main.Service.JWTService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+class UserServicesApplicationTests {
+
+    @Mock
+    private AuthRepo authRepo;
+
+    @Mock
+    private JWTService jwtService;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private AuthService authService;
+
+    private Authentication_Entity testUser;
+
+    @BeforeEach
+    void setUp() {
+        testUser = new Authentication_Entity();
+        testUser.setUsername("testuser");
+        testUser.setPassword("password123");
+    }
+
+    @Test
+    void contextLoads() {
+        // Context loads test
+    }
+
+    @Test
+    void registerUser_Success() {
+        // Arrange
+        String encodedPassword = "encodedPassword123";
+        when(passwordEncoder.encode(testUser.getPassword())).thenReturn(encodedPassword);
+        when(authRepo.save(testUser)).thenReturn(testUser);
+
+        // Act
+        Authentication_Entity result = authService.register(testUser);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(encodedPassword, result.getPassword());
+        verify(passwordEncoder).encode(testUser.getPassword());
+        verify(authRepo).save(testUser);
+    }
+
+    @Test
+    void verifyUser_Success() {
+        // Arrange
+        String token = "generated.jwt.token";
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(testUser.getUsername(), testUser.getPassword()))
+        ).thenReturn(authentication);
+        when(jwtService.generateToken(testUser.getUsername())).thenReturn(token);
+
+        // Act
+        String result = authService.verify(testUser);
+
+        // Assert
+        assertEquals(token, result);
+        verify(authenticationManager).authenticate(any());
+        verify(jwtService).generateToken(testUser.getUsername());
+    }
+
+    @Test
+    void verifyUser_Failure() {
+        // Arrange
+        when(authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(testUser.getUsername(), testUser.getPassword()))
+        ).thenThrow(new BadCredentialsException("Invalid credentials"));
+
+        // Act
+        String result = authService.verify(testUser);
+
+        // Assert
+        assertEquals("fail", result);
+        verify(authenticationManager).authenticate(any());
+        verify(jwtService, never()).generateToken(any());
+    }
+}

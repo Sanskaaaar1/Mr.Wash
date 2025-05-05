@@ -11,9 +11,13 @@ import com.main.Entity.Info_Entity;
 
 public interface InfoRepo extends JpaRepository<Info_Entity, Integer>{
 
+	// Getting the info by First Name
 	Info_Entity findByFirstNameIgnoreCase(String Name);
 	
+	// Getting the Info By Info ID
 	Info_Entity findByInfoId(Integer id);
+	
+	// Getting info details by User Name
 	@Query("SELECT u FROM Info_Entity u WHERE u.authentication.username = :username")
     Info_Entity findByAuthenticationUsername(@Param("username") String username);
 }

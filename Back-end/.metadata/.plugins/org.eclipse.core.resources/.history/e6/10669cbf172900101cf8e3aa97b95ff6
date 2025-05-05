@@ -1,0 +1,151 @@
+package com.main;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+import com.main.Service.BookingService;
+import com.main.Service.InfoServices;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+class EmployeeServiceApplicationTests {
+
+    @Mock
+    private BookingService bookingService;
+
+    @Mock
+    private InfoServices infoServices;
+
+    private Booking_Entity testBooking;
+    private Info_Entity testInfo;
+
+    @BeforeEach
+    void setUp() {
+        testBooking = new Booking_Entity();
+        testBooking.setBookingId(1);
+        testBooking.setStatus("Pending");
+        testBooking.setSlotDate(LocalDate.now());
+
+        testInfo = new Info_Entity();
+        testInfo.setFirstName("John Doe");
+        testInfo.setDetails("Some information about John");
+    }
+
+    // Test for BookingService - getBookingsByStatus
+    @Test
+    void getBookingsByStatus_ReturnsBookingList() {
+        // Arrange
+        when(bookingService.getBookingsByStatus("Pending")).thenReturn(Arrays.asList(testBooking));
+
+        // Act
+        List<Booking_Entity> result = bookingService.getBookingsByStatus("Pending");
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Pending", result.get(0).getStatus());
+    }
+
+    // Test for BookingService - updateByBookingid
+    @Test
+    void updateByBookingid_UpdatesStatus() {
+        // Arrange
+        when(bookingService.updateByBookingid(1, "Completed")).thenReturn(Optional.of(testBooking));
+        testBooking.setStatus("Completed");
+
+        // Act
+        Optional<Booking_Entity> result = bookingService.updateByBookingid(1, "Completed");
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals("Completed", result.get().getStatus());
+    }
+
+    // Test for BookingService - getBookingByDate
+    @Test
+    void getBookingByDate_ReturnsBookingList() {
+        // Arrange
+        when(bookingService.getBookingByDate(LocalDate.now())).thenReturn(Arrays.asList(testBooking));
+
+        // Act
+        List<Booking_Entity> result = bookingService.getBookingByDate(LocalDate.now());
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(LocalDate.now(), result.get(0).getSlotDate());
+    }
+
+    // Test for BookingService - getBookingById
+    @Test
+    void getBookingById_ReturnsBooking() {
+        // Arrange
+        when(bookingService.getBookingById(1)).thenReturn(Optional.of(testBooking));
+
+        // Act
+        Optional<Booking_Entity> result = bookingService.getBookingById(1);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals(1, result.get().getBookingId());
+    }
+
+    // Test for BookingService - AddEmp
+    @Test
+    void AddEmp_ReturnsUpdatedBooking() {
+        // Arrange
+        testBooking.setEmpName("John Doe");
+        when(bookingService.AddEmp(1, "John Doe")).thenReturn(testBooking);
+
+        // Act
+        Booking_Entity result = bookingService.AddEmp(1, "John Doe");
+
+        // Assert
+        assertEquals("John Doe", result.getEmpName());
+        assertEquals(1, result.getBookingId());
+    }
+
+    // Test for BookingService - getBookingsHandledByEmployee
+    @Test
+    void getBookingsHandledByEmployee_ReturnsBookingList() {
+        // Arrange
+        when(bookingService.getBookingsHandledByEmployee("John Doe")).thenReturn(Arrays.asList(testBooking));
+
+        // Act
+        List<Booking_Entity> result = bookingService.getBookingsHandledByEmployee("John Doe");
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("John Doe", result.get(0).getEmpName());
+    }
+
+    // Test for InfoServices - getByName
+    @Test
+    void getByName_ReturnsInfoEntity() {
+        // Arrange
+        when(infoServices.getByName("John Doe")).thenReturn(testInfo);
+
+        // Act
+        Info_Entity result = infoServices.getByName("John Doe");
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("John Doe", result.getFirstName());
+        assertEquals("Some information about John", result.getDetails());
+    }
+}

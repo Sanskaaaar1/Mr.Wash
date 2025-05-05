@@ -1,8 +1,0 @@
-package com.main.Service;
-
-import com.main.Entity.Authentication_Entity;
-
-public interface AuthenticationService {
-
-	Authentication_Entity findByUsername(String username);
-}

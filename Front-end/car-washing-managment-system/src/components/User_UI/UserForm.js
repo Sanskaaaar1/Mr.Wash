@@ -20,8 +20,32 @@ export default function UserForm() {
 
   const [errors, setErrors] = useState({});
   const [usernameAvailable, setUsernameAvailable] = useState(true);
+  const [passwordStrength, setPasswordStrength] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const validatePassword = (password) => {
+    const errors = [];
+    
+    if (password.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Password must contain at least one uppercase letter');
+    }
+    
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('Password must contain at least one special character');
+    }
+    
+    const numberCount = (password.match(/[0-9]/g) || []).length;
+    if (numberCount < 2) {
+      errors.push('Password must contain at least two numbers');
+    }
+    
+    return errors.length === 0 ? null : errors.join(', ');
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -47,6 +71,10 @@ export default function UserForm() {
 
     if (!formData.username.trim()) newErrors.username = 'Username is required';
     if (!formData.password.trim()) newErrors.password = 'Password is required';
+    else {
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) newErrors.password = passwordError;
+    }
 
     if (!usernameAvailable) newErrors.username = 'Username already taken. Try another.';
 
@@ -60,22 +88,35 @@ export default function UserForm() {
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
 
+    // Password strength check
+    if (name === 'password') {
+      if (value.length === 0) {
+        setPasswordStrength('');
+      } else {
+        const passwordError = validatePassword(value);
+        if (passwordError) {
+          setPasswordStrength('weak');
+        } else {
+          setPasswordStrength('strong');
+        }
+      }
+    }
+
     // Live check for username availability
     if (name === 'username') {
-      if (value.trim().length > 2) { // only check if username length > 2
+      if (value.trim().length > 2) {
         try {
           const response = await axios.get(`http://localhost:3333/user/SearchUsername/${value}`);
-          console.log(response.data);
           if (response.data) {
-            setUsernameAvailable(false); // username already exists
+            setUsernameAvailable(false);
           } else {
-            setUsernameAvailable(true);  // username available
+            setUsernameAvailable(true);
           }
         } catch (err) {
-          setUsernameAvailable(true); // if any error (e.g., 404 Not Found), assume username is available
+          setUsernameAvailable(true);
         }
       } else {
-        setUsernameAvailable(true); // if typing too short, reset
+        setUsernameAvailable(true);
       }
     }
   };
@@ -89,21 +130,19 @@ export default function UserForm() {
       const role = localStorage.getItem('role');
       const response = await axios.post('http://localhost:3333/user/register', formData);
       alert('Successfully Created New Account');
-      if(role==='admin'){
+      if(role === 'admin'){
         navigate('/admin-dashboard')
-      }else{
+      } else {
         navigate('/login');
       }
-      navigate('/login');
-      console.log(response);
     } catch (error) {
       console.error("Registration failed:", error);
       setErrors({ global: error.response?.data || error.message });
-      
     } finally {
       setLoading(false);
     }
   };
+
   const role = localStorage.getItem('role');
   
   return (
@@ -150,12 +189,24 @@ export default function UserForm() {
                   <label className="form-label">{label}</label>
                   <input
                     type={name === 'password' ? 'password' : name === 'age' ? 'number' : 'text'}
-                    className={`form-control ${name === 'username' && !usernameAvailable ? 'is-invalid' : ''}`}
+                    className={`form-control ${
+                      name === 'username' && !usernameAvailable ? 'is-invalid' : 
+                      name === 'password' && passwordStrength ? (passwordStrength === 'strong' ? 'is-valid' : 'is-invalid') : ''
+                    }`}
                     name={name}
                     value={formData[name]}
                     onChange={handleChange}
                     min={name === 'age' ? 18 : undefined}
                   />
+                  {name === 'password' && formData.password && (
+                    <div className={`small mt-1 ${
+                      passwordStrength === 'strong' ? 'text-success' : 'text-danger'
+                    }`}>
+                      {passwordStrength === 'strong' 
+                        ? 'Password meets all requirements' 
+                        : 'Password must contain: 8+ chars, 1 uppercase, 1 special char, 2+ numbers'}
+                    </div>
+                  )}
                   {errors[name] && <small className="text-danger">{errors[name]}</small>}
                 </div>
               ))}

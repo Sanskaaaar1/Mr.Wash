@@ -1,0 +1,49 @@
+package com.main.Service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.main.Entity.Authentication_Entity;
+import com.main.Repository.AuthRepo;
+
+@Service
+public class AuthService {
+
+    @Autowired
+    private JWTService jwtService;  // JWTService to generate JWT tokens
+
+    @Autowired
+    AuthenticationManager authManager;  // AuthenticationManager to handle the authentication logic
+
+    @Autowired
+    private AuthRepo repo;  // Repository to interact with the Authentication_Entity table
+
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);  // Encoder for password encryption
+
+    // Method to register a new user by encrypting the password and saving the user to the repository
+    public Authentication_Entity register(Authentication_Entity user) {
+        // Encrypt the user's password before saving
+        user.setPassword(encoder.encode(user.getPassword()));
+        repo.save(user); 
+        return user; 
+    }
+
+    // Method to verify a user's login credentials and return a JWT token if authentication is successful
+    public String verify(Authentication_Entity user) {
+        // Create a UsernamePasswordAuthenticationToken for authentication
+        Authentication authentication = authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+        );
+        
+        // If authentication is successful, generate and return the JWT token
+        if (authentication.isAuthenticated()) {
+            return jwtService.generateToken(user.getUsername());
+        } else {
+            return "fail";  // If authentication fails, return "fail"
+        }
+    }
+}

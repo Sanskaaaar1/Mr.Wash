@@ -1,0 +1,22 @@
+server.port=3333
+
+spring.application.name=CLOUD-API-GATEWAY
+
+spring.cloud.gateway.discovery.locator.enabled=true
+
+
+
+spring.cloud.gateway.routes[0].id=User-Services
+spring.cloud.gateway.routes[0].uri=http://localhost:9091
+spring.cloud.gateway.routes[0].predicates[0]=Path=/user/**
+spring.cloud.gateway.routes[0].filters[0]=RewritePath=/user/(?<remaining>.*), /${remaining}
+
+spring.cloud.gateway.routes[1].id=Admin-Services
+spring.cloud.gateway.routes[1].uri=http://localhost:9092
+spring.cloud.gateway.routes[1].predicates[0]=Path=/admin/**
+spring.cloud.gateway.routes[1].filters[0]=RewritePath=/admin/(?<remaining>.*), /${remaining}
+
+spring.cloud.gateway.routes[2].id=Employee-Service
+spring.cloud.gateway.routes[2].uri=http://localhost:9093
+spring.cloud.gateway.routes[2].predicates[0]=Path=/emp/**
+spring.cloud.gateway.routes[2].filters[0]=RewritePath=/emp/(?<remaining>.*), /${remaining}

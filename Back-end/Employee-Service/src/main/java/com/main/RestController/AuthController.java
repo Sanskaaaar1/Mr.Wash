@@ -41,11 +41,12 @@ public class AuthController {
     public AuthRepo authRepo;
     @Autowired
     public BCryptPasswordEncoder passwordEncoder;
-
+    
+    //Adding the new Employee
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterValidation registers) {
        
-        // Validation checks (unchanged)
+  
         if(registers.getFirstName()==null || registers.getFirstName().trim().isEmpty()) {
             throw new FirstNameExceprtion("First Name is Required");
         }
@@ -83,7 +84,7 @@ public class AuthController {
         if(registers.getPassword()==null || registers.getPassword().trim().isEmpty()) {
             throw new NullPassword("Pasword is Required");
         }
-        if(registers.getMail()==null || registers.getMail().trim().isEmpty()) {  // Fixed: was checking password instead of mail
+        if(registers.getMail()==null || registers.getMail().trim().isEmpty()) {  
             throw new NullMailException("Mail is Required");
         }
         if (!registers.getMail().matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$")) {
@@ -103,23 +104,22 @@ public class AuthController {
         info.setGender(Info_Entity.Gender.valueOf(registers.getGender().substring(0, 1).toUpperCase() + registers.getGender().substring(1).toLowerCase()));
 
         
-        // Create Authentication_Entity
+       
         Authentication_Entity auth = new Authentication_Entity();
         auth.setRole(Authentication_Entity.Role.EMP);
         auth.setUsername(registers.getUsername());
         auth.setPassword(passwordEncoder.encode(registers.getPassword()));
         
-        // Establish the bidirectional relationship
-        auth.setUser(info);  // Set the Info_Entity reference in Authentication_Entity
-        info.setAuthentication(auth);  // Set the Authentication_Entity reference in Info_Entity
+        auth.setUser(info);  
+        info.setAuthentication(auth); 
         
-        // Save the entities (order matters due to foreign key constraints)
-        info = infoRepo.save(info);  // Save Info_Entity first to generate ID
-        authRepo.save(auth);         // Then save Authentication_Entity with the reference
-        
+       
+        info = infoRepo.save(info); 
+        authRepo.save(auth);         
         return ResponseEntity.ok("Account created successfully!");
     }
 
+    //Login crediantial
     @PostMapping("/login")
     public String login(@RequestBody Authentication_Entity user) {
         return service.verify(user);

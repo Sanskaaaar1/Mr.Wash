@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function EmpForm() {
-  
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -20,8 +19,32 @@ export default function EmpForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const validatePassword = (password) => {
+    const errors = [];
+    
+    if (password.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Password must contain at least one uppercase letter');
+    }
+    
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      errors.push('Password must contain at least one special character');
+    }
+    
+    const numberCount = (password.match(/[0-9]/g) || []).length;
+    if (numberCount < 2) {
+      errors.push('Password must contain at least two numbers');
+    }
+    
+    return errors.length === 0 ? null : errors.join(', ');
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -47,14 +70,33 @@ export default function EmpForm() {
 
     if (!formData.username.trim()) newErrors.username = 'Username is required';
     if (!formData.password.trim()) newErrors.password = 'Password is required';
+    else {
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) newErrors.password = passwordError;
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: '' });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: '' });
+
+    // Password strength check
+    if (name === 'password') {
+      if (value.length === 0) {
+        setPasswordStrength('');
+      } else {
+        const passwordError = validatePassword(value);
+        if (passwordError) {
+          setPasswordStrength('weak');
+        } else {
+          setPasswordStrength('strong');
+        }
+      }
+    }
   };
 
   const handleSubmitForm = async (e) => {
@@ -66,12 +108,11 @@ export default function EmpForm() {
       const role = localStorage.getItem('role');
       await axios.post('http://localhost:3333/emp/register', formData);
       alert('Account created successfully!');
-      if(role==='admin'){
+      if(role === 'admin'){
         navigate('/admin-dashboard')
-      }else{
+      } else {
         navigate('/login');
       }
-      
     } catch (error) {
       console.error("Registration failed:", error);
       setErrors({ global: error.response?.data || error.message });
@@ -81,9 +122,10 @@ export default function EmpForm() {
   };
 
   const role = localStorage.getItem('role');
-  if (role !== 'emp' && role !=='admin') {
+  if (role !== 'emp' && role !== 'admin') {
     return <h2 className="text-danger text-center mt-5">Unauthorized Access</h2>;
   }
+
   return (
     <div className="bg-light min-vh-100 d-flex align-items-center justify-content-center p-4">
       <div className="card shadow-lg p-5" style={{ maxWidth: '700px', width: '100%' }}>
@@ -128,12 +170,24 @@ export default function EmpForm() {
                   <label className="form-label">{label}</label>
                   <input
                     type={name === 'password' ? 'password' : name === 'age' ? 'number' : 'text'}
-                    className="form-control"
+                    className={`form-control ${
+                      name === 'password' && passwordStrength ? 
+                      (passwordStrength === 'strong' ? 'is-valid' : 'is-invalid') : ''
+                    }`}
                     name={name}
                     value={formData[name]}
                     onChange={handleChange}
                     min={name === 'age' ? 18 : undefined}
                   />
+                  {name === 'password' && formData.password && (
+                    <div className={`small mt-1 ${
+                      passwordStrength === 'strong' ? 'text-success' : 'text-danger'
+                    }`}>
+                      {passwordStrength === 'strong' 
+                        ? 'Password meets all requirements' 
+                        : 'Password must contain: 8+ chars, 1 uppercase, 1 special char, 2+ numbers'}
+                    </div>
+                  )}
                   {errors[name] && <small className="text-danger">{errors[name]}</small>}
                 </div>
               ))}

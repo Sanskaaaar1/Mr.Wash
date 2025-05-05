@@ -14,13 +14,13 @@ import com.main.Repository.AuthRepo;
 public class AuthService {
 
     @Autowired
-    private JWTService jwtService;  // JWTService to generate JWT tokens
+    private JWTService jwtService;  
 
     @Autowired
-    AuthenticationManager authManager;  // AuthenticationManager to handle the authentication logic
+    AuthenticationManager authManager;  
 
     @Autowired
-    private AuthRepo repo;  // Repository to interact with the Authentication_Entity table
+    private AuthRepo repo; 
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);  // Encoder for password encryption
 
@@ -28,8 +28,8 @@ public class AuthService {
     public Authentication_Entity register(Authentication_Entity user) {
         // Encrypt the user's password before saving
         user.setPassword(encoder.encode(user.getPassword()));
-        repo.save(user);  // Save the user to the database
-        return user;  // Return the saved user
+        repo.save(user); 
+        return user; 
     }
 
     // Method to verify a user's login credentials and return a JWT token if authentication is successful
@@ -43,7 +43,7 @@ public class AuthService {
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(user.getUsername());
         } else {
-            return "fail";  // If authentication fails, return "fail"
+            return "fail";  
         }
     }
 }

@@ -18,13 +18,13 @@ public class MyUserDetailsService implements UserDetailsService {
     @Autowired
     private AuthRepo authRepo;
 
-
+    //Cheaking the User Authentication
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     	Authentication_Entity user = authRepo.findByUsername(username);
         if (user == null) {
             System.out.println("User Not Found");
-            throw new UsernameNotFoundException("user not found");
+            throw new UsernameNotFoundException("Employee not found");
         }
         
         return new UserPrincipal(user);

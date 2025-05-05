@@ -22,6 +22,7 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    // get list of booking Info  by the status
     @Override
     public List <Booking_Entity> getBookingsByStatus(String status) {
     	
@@ -33,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
         return bookings;
     }
 
+  //Update the  Booking Info by the Booking ID
 	@Override
 	public Optional<Booking_Entity> updateByBookingid(Integer id, String status) {
 		// TODO Auto-generated method stub
@@ -48,6 +50,7 @@ public class BookingServiceImpl implements BookingService {
 	}
 }
 
+	// Get Booking Details By date
 	@Override
 	public List<Booking_Entity> getBookingByDate(LocalDate date) {
 		List<Booking_Entity> booking=bookingRepository.getBookingsByDate(date);
@@ -68,12 +71,15 @@ public class BookingServiceImpl implements BookingService {
 		
 	}
 
+	//Get booking Details By Booking ID
 	@Override
 	public Optional<Booking_Entity> getBookingById(Integer id) {
 		// TODO Auto-generated method stub
 		
 		return bookingRepository.findById(id);
 	}
+	
+	//Add the Employee Name in Booking Details
     @Override
     public Booking_Entity AddEmp(Integer bookingid, String empName) {
         int updated = bookingRepository.AddEmp(bookingid, empName);
@@ -84,6 +90,8 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
     
     }
+    
+    // Get the Booking Which Are Service By Employee
     @Override
     public List<Booking_Entity> getBookingsHandledByEmployee(String empName) {
         return bookingRepository.findByEmpName(empName);

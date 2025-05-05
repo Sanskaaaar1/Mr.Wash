@@ -158,16 +158,16 @@ export default function SlotBooking() {
               <div className="form-group mt-3">
                 <label className="form-label">Service Type</label>
                 <select
-  name="services"
-  className="form-control"
-  value={formData.services}
-  onChange={handleChange}
->
-  <option value="">Select Service Type</option>
-  <option value="Basic">Basic</option>
-  <option value="Delux">Delux</option>
-  <option value="Premium">Premium</option>
-</select>
+                  name="services"
+                  className="form-control"
+                  value={formData.services}
+                  onChange={handleChange}
+                >
+                <option value="">Select Service Type</option>
+                <option value="Basic">Basic</option>
+                <option value="Delux">Delux</option>
+                <option value="Premium">Premium</option>
+                </select>
 
                 {submitted && !formData.services && (
                   <small className="text-danger">Required</small>

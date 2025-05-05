@@ -44,33 +44,42 @@ public class MyRestController {
 	@Autowired
 	public BookingRepository bookingRepository;
 	
+	//Getting List Of Booking by Status
 	@GetMapping("/status/{stus}")
 	public List<Booking_Entity> searchByStatus(@PathVariable String stus  ) {
 		  return bookingService.getBookingsByStatus(stus);
 	}
 	
+	//Updating status By booking ID
 	@PutMapping("/update/{id}/{status}")
 	public Optional<Booking_Entity> updateById(@PathVariable Integer id, @PathVariable String status) {
 		Optional<Booking_Entity> booking=bookingService.updateByBookingid(id,status);
 		return booking;
 	}
 	
+	//Getting Booking List of Todays 
 	@GetMapping("/todaysTask")
 	public List<Booking_Entity> todaysTask(){
 		LocalDate date=LocalDate.now();//plusDays(2);
 		List<Booking_Entity> booking=bookingService.getBookingByDate(date);
 		return booking;
 	}
+	
+	//Getting Booking By Booking ID
 	@GetMapping("/searchByID/{id}")
 	public Optional<Booking_Entity> searchByID(@PathVariable Integer id) {
 		return bookingService.getBookingById(id);
 	}
+	
+	//Getting Booking History By User FirstName
 	@GetMapping("/searchByName/{name}")
 	public List<Booking_Entity> searchByName(@PathVariable String name) {
 	    Info_Entity info = infoService.getByName(name);
 	    List<Booking_Entity> BookingList = info.getBookings();
 	    return BookingList;
 	}
+	
+	//Updating EmpName By Booking ID
 	@GetMapping("/addEmpname/{bookingid}")
 	public Booking_Entity addEmpName(@PathVariable Integer bookingid) {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,12 +89,16 @@ public class MyRestController {
 	    System.out.println("Logged in username: " + username);
 	    return bookingService.AddEmp(bookingid, username);
 	}
+	
+	//Getting Info Details By Info ID
 	@GetMapping("/searchByInfoId/{id}")
 	public Optional<Info_Entity> searchByInfoId(@PathVariable Integer id){
 		
 		Optional<Info_Entity> info=infoService.searchByInfoId(id);
 		return info;
 	}
+	
+	//Update User Details
 	@PostMapping("/UpdateUser/{userId}")
 	public Info_Entity UpdateUser(@RequestBody RegisterValidation registers,@PathVariable Integer userId) {
 		Optional<Info_Entity> info=infoService.searchByInfoId(userId);
@@ -108,6 +121,7 @@ public class MyRestController {
 			
 	}
 	
+	//Update slot Date and Time 
 	@PutMapping("updateSlot/{id}/{date}/{time}")
 	public ResponseEntity<Booking_Entity> updateSlot(
 	        @PathVariable Integer id,

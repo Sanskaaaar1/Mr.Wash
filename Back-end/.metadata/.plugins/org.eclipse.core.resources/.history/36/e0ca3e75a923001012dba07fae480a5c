@@ -1,9 +1,0 @@
-package com.main.ServiceImpl;
-
-import com.main.Entity.Authentication_Entity;
-import com.main.Service.AuthenticationService;
-
-public class AuthenticationServiceImpl implements AuthenticationService {
-
-	Authentication_Entity findByUsername(String username);
-}

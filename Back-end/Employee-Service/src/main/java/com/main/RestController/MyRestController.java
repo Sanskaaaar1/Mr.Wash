@@ -37,39 +37,47 @@ public class MyRestController {
 	public InfoRepo infoRepository;
 	
 	
-	
+	//Getting List of Booking by status 
 	@GetMapping("/status/{stus}")
 	public List<Booking_Entity> searchByStatus(@PathVariable String stus  ) {
 		  return bookingService.getBookingsByStatus(stus);
 	}
 	
+	//Updating status by finding Booking ID
 	@PutMapping("/update/{id}/{status}")
 	public Optional<Booking_Entity> updateById(@PathVariable Integer id, @PathVariable String status) {
 		Optional<Booking_Entity> booking=bookingService.updateByBookingid(id,status);
 		return booking;
 	}
 	
+	//List Of Booking Of todays Date	
 	@GetMapping("/todaysTask")
 	public List<Booking_Entity> todaysTask(){
 		LocalDate date=LocalDate.now();
 		List<Booking_Entity> booking=bookingService.getBookingByDate(date);
 		return booking;
 	}
+	
+	// Getting Booking Information By Booking ID
 	@GetMapping("/searchByID/{id}")
 	public Optional<Booking_Entity> searchByID(@PathVariable Integer id) {
 		return bookingService.getBookingById(id);
 	}
+	
+	//Getting User Booking History By User Name
 	@GetMapping("/searchByName/{name}")
 	public List<Booking_Entity> searchByName(@PathVariable String name) {
 	    Info_Entity info = infoService.getByName(name);
 	    List<Booking_Entity> BookingList = info.getBookings();
 	    return BookingList;
 	}
+	
+	//Getting user details
 	@GetMapping("/MyDetails")
 	public Info_Entity MyDetails() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    String username = authentication.getName(); 
-	    //username=username+" (Emp)";
+	   
 	Info_Entity user =infoRepository.findByAuthenticationUsername(username);
 	if(user==null) {
 		throw new UserNotFoundException("User Not Found");
@@ -78,6 +86,8 @@ public class MyRestController {
 	return user;
 	}
 	
+	
+	//Adding Employees name In Booking 
 	@GetMapping("/addEmpname/{bookingid}")
 	public Booking_Entity addEmpName(@PathVariable Integer bookingid) {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -88,6 +98,7 @@ public class MyRestController {
 	    return bookingService.AddEmp(bookingid, username);
 	}
 	
+	// Getting the History of Employee
 	@GetMapping("/history")
 	public List<Booking_Entity> getMyHandledBookings() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

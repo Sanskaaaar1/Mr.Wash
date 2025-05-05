@@ -1,7 +1,0 @@
-package com.main.ServiceImpl;
-
-import com.main.Service.AuthenticationService;
-
-public class AuthenticationServiceImpl implements AuthenticationService {
-
-}

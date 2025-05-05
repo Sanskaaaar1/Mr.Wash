@@ -1,0 +1,15 @@
+package com.main.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+import com.main.Entity.Booking_Entity;
+import com.main.Entity.Info_Entity;
+
+public interface InfoServices {
+	
+	//Getting Info by FirstName
+	Info_Entity getByName(String Name);
+	
+	Optional<Info_Entity>searchByInfoId(Integer id);
+}

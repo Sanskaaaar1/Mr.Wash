@@ -9,5 +9,6 @@ import com.main.Entity.Authentication_Entity;
 @Repository
 public interface AuthRepo extends JpaRepository<Authentication_Entity, Integer> {
 
+	//Getting the Info By UserName
 	Authentication_Entity findByUsername(String username);
 }
